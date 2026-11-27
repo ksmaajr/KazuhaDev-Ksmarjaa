@@ -35,14 +35,9 @@ class PurchaseService
             if (! $product->is_active) {
                 throw ValidationException::withMessages(['product' => 'Paket tidak tersedia.']);
             }
-            if ($renewal) {
-                $allowed = $locked->games()->allRelatedIds()->map(fn ($id) => (int) $id)->sort()->values()->all();
-                $access = collect($product->game_ids)->map(fn ($id) => (int) $id)->sort()->values()->all();
-                if ($allowed !== $access) {
-                    throw ValidationException::withMessages(['product_id' => 'Pilih paket dengan akses game yang sama dengan key Anda.']);
-                }
-            }
-            $order = PurchaseOrder::create(['number' => 'KZ-'.now()->format('ymd').'-'.strtoupper(Str::random(8)), 'idempotency_key' => $token, 'owner_license_id' => $locked->id, 'license_product_id' => $product->id, 'member_name' => $locked->member_name ?: $locked->label, 'product_name' => $product->name, 'days' => $product->days, 'duration_seconds' => $product->duration_seconds ?? $product->days * 86400, 'product_description' => $product->description, 'game_snapshot' => Game::whereIn('id', $product->game_ids)->get(['id', 'name', 'code'])->toArray(), 'game_ids' => $product->game_ids, 'amount' => $product->price]);
+            // Renewal purchases add time only; the existing game entitlements remain unchanged.
+            $gameIds = $renewal ? $locked->games()->allRelatedIds()->all() : $product->game_ids;
+            $order = PurchaseOrder::create(['number' => 'KZ-'.now()->format('ymd').'-'.strtoupper(Str::random(8)), 'idempotency_key' => $token, 'owner_license_id' => $locked->id, 'license_product_id' => $product->id, 'member_name' => $locked->member_name ?: $locked->label, 'product_name' => $product->name, 'days' => $product->days, 'duration_seconds' => $product->duration_seconds ?? $product->days * 86400, 'product_description' => $product->description, 'game_snapshot' => Game::whereIn('id', $gameIds)->get(['id', 'name', 'code'])->toArray(), 'game_ids' => $gameIds, 'amount' => $product->price]);
             $order->update(['purpose' => $renewal ? 'renewal' : 'purchase', 'target_license_id' => $renewal ? $locked->id : null, 'target_key_hint' => $locked->key_hint]);
             LicenseEvent::create(['license_key_id' => $locked->id, 'action' => 'order_created', 'ip_address' => $ip, 'metadata' => ['order_number' => $order->number, 'amount' => $order->amount]]);
 
