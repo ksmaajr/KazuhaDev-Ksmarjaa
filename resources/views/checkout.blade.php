@@ -24,17 +24,35 @@
         <div class="invoice-grid">
             <section class="invoice-summary" aria-label="Ringkasan invoice"><h2 class="invoice-section-title"><span><x-icon name="receipt" size="18"/></span> Detail pesanan</h2>
                 <div class="receipt-reference"><span><x-icon name="hash" size="13"/> Nomor invoice</span><strong>{{ $order->number }}</strong><button type="button" class="icon-btn" data-copy="{{ $order->number }}" aria-label="Salin nomor invoice"><x-icon name="copy" size="16"/></button></div>
+                <div class="studio-order-group"><span class="studio-order-caption">01 / INFORMASI PEMBELI</span>
+                <dl class="invoice-facts studio-buyer-facts">
+                    <div><dt><x-icon name="user" size="15"/>Nama pemilik</dt><dd>{{ $order->member_name }}</dd></div>
+                    <div><dt>WhatsApp / kontak</dt><dd>{{ $order->customer_contact ?: 'Tidak dicantumkan' }}</dd></div>
+                    <div><dt>Email</dt><dd>{{ $order->customer_email ?: 'Tidak dicantumkan' }}</dd></div>
+                </dl></div>
+                <div class="studio-order-group"><span class="studio-order-caption">02 / INFORMASI LISENSI</span>
                 <dl class="invoice-facts">
                     @foreach([
-                        ['user','Pemilik',$order->member_name],
                         ['package','Paket',$order->product_name],
                         ['shopping','Jenis',$order->purpose==='renewal'?'Perpanjangan key yang sama':'Pembelian key baru'],
                         ['clock','Durasi',\App\Support\LicenseDuration::label($order->duration_seconds ?? $order->days*86400)],
-                        ['wallet','Metode',$order->payment_provider ? $order->payment_provider.' · '.strtoupper($order->payment_method) : 'Belum dipilih'],
-                        ['calendar','Dibuat',$order->created_at->timezone('Asia/Jakarta')->format('d M Y, H:i').' WIB']
+                        ['key','Aktivasi',$order->purpose==='renewal'?'Setelah pembayaran terverifikasi':'Sejak aktivasi pertama']
                     ] as [$icon,$label,$value])<div><dt><x-icon :name="$icon" size="15"/>{{ $label }}</dt><dd>{{ $value }}</dd></div>@endforeach
                     @if($order->target_key_hint)<div><dt><x-icon name="key" size="15"/>Key tujuan</dt><dd>{{ $order->target_key_hint }}</dd></div>@endif
                 </dl>
+                @if(!empty($order->game_snapshot))<div class="studio-order-games"><span>Game dalam paket</span><div>@foreach($order->game_snapshot as $game)<span class="studio-game-chip"><x-icon name="check" size="13"/> {{ $game['name'] ?? $game['code'] ?? 'Game' }}</span>@endforeach</div></div>@endif
+                @if($order->product_description)<p class="studio-order-description">{{ $order->product_description }}</p>@endif
+                </div>
+                <div class="studio-order-group"><span class="studio-order-caption">03 / INFORMASI TRANSAKSI</span><dl class="invoice-facts">
+                    <div><dt><x-icon name="wallet" size="15"/>Metode</dt><dd>{{ $order->payment_provider ? $order->payment_provider.' · '.strtoupper($order->payment_method) : 'Belum dipilih' }}</dd></div>
+                    <div><dt>Status pesanan</dt><dd class="studio-order-status {{ $isPaid ? 'is-paid' : '' }}">{{ $isPaid ? 'Terverifikasi' : ($isCancelled ? 'Dibatalkan' : 'Menunggu pembayaran') }}</dd></div>
+                    <div><dt>Mode transaksi</dt><dd>{{ ($order->gateway_mode ?: $gatewayMode)==='sandbox' ? 'Sandbox / Demo' : 'Production' }}</dd></div>
+                    <div><dt><x-icon name="calendar" size="15"/>Dibuat</dt><dd>{{ $order->created_at->timezone('Asia/Jakarta')->format('d M Y, H:i') }} WIB</dd></div>
+                    @if($order->gateway_expires_at && !$isPaid && !$isCancelled)<div><dt>Batas pembayaran</dt><dd>{{ $order->gateway_expires_at->timezone('Asia/Jakarta')->format('d M Y, H:i') }} WIB</dd></div>@endif
+                    @if($order->paid_at)<div><dt>Dibayar</dt><dd>{{ $order->paid_at->timezone('Asia/Jakarta')->format('d M Y, H:i') }} WIB</dd></div>@endif
+                    @if($order->issuedLicense)<div><dt>Key terdaftar</dt><dd>{{ $order->issuedLicense->key_hint }}</dd></div>@endif
+                    <div class="studio-order-total"><dt>Total invoice</dt><dd>Rp {{ number_format($order->amount,0,',','.') }}</dd></div>
+                </dl></div>
                 <div class="invoice-assurance"><x-icon name="shield" size="19"/><div><strong>Konfirmasi dari server</strong><p>Nominal mengikuti invoice. Status lunas hanya diproses setelah pembayaran terverifikasi.</p></div></div>
             </section>
             <section class="invoice-payment" aria-label="Pembayaran invoice"><h2 class="invoice-section-title"><span><x-icon name="wallet" size="18"/></span>{{ $isPaid?'Hasil pembayaran':'Metode & pembayaran' }}</h2>
@@ -123,5 +141,20 @@
 .checkout-studio .studio-method-check svg{opacity:0}
 .checkout-studio .studio-method-choice:has(input:checked) .studio-method-check{background:var(--mint);color:#25182b;border-color:var(--mint)}
 .checkout-studio .studio-method-choice:has(input:checked) .studio-method-check svg{opacity:1}
+
+.checkout-studio .studio-order-group{margin:14px 0 0;min-width:0}
+.checkout-studio .studio-order-caption{display:block;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:1.2px;padding:8px 0;border-bottom:1px solid var(--line)}
+.checkout-studio .studio-order-group .invoice-facts{margin:0 0 8px}
+.checkout-studio .studio-order-group .invoice-facts>div{padding:9px 0;display:flex;justify-content:space-between;align-items:baseline}
+.checkout-studio .studio-order-group .invoice-facts dt{font-size:12px;flex:0 0 40%}
+.checkout-studio .studio-order-group .invoice-facts dd{font-size:13px;flex:1}
+.checkout-studio .studio-order-games{display:grid;gap:8px;padding:10px 0;font-size:12px;color:var(--muted)}
+.checkout-studio .studio-order-games>div{display:flex;flex-wrap:wrap;gap:6px}
+.checkout-studio .studio-game-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--soft);color:var(--text);border-radius:8px;padding:6px 9px}
+.checkout-studio .studio-order-description{font-size:12px;line-height:1.7;color:var(--muted);overflow-wrap:anywhere;padding-bottom:8px}
+.checkout-studio .studio-order-status{color:var(--mint);font-weight:600}
+.checkout-studio .studio-order-status.is-paid{color:var(--invoice-success)}
+.checkout-studio .studio-order-group .studio-order-total dd{font-size:20px;font-weight:750;letter-spacing:-.04em}
+.checkout-studio .invoice-summary .invoice-assurance{margin-top:18px}
 </style>
 </x-public-layout>
