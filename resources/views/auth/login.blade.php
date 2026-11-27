@@ -10,7 +10,7 @@
     @vite(['resources/css/app.css','resources/js/app.js'])
 </head>
 <body class="kz-auth">
-    <main class="kz-auth-shell">
+    <main class="kz-auth-shell" data-no-ui-icon>
         <section class="kz-auth-editorial" aria-labelledby="auth-heading">
             <div class="kz-auth-brand"><a href="{{ route('home') }}" class="kz-auth-wordmark" aria-label="KazuhaDev, beranda"><span class="kz-auth-monogram">KZ</span><span>KazuhaDev<span class="kz-auth-period">.</span></span></a><span class="kz-auth-edition">ADMIN / 01</span></div>
             <div class="kz-auth-story">
