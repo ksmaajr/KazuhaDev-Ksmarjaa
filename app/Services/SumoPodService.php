@@ -26,6 +26,12 @@ class SumoPodService
             if ($locked->status !== 'pending' || $locked->gateway_payment_id) {
                 return false;
             }
+            if ($locked->purpose === 'renewal') {
+                $demo = PurchaseOrder::where('issued_license_id', $locked->target_license_id)->where('gateway_mode', 'sandbox')->where('purpose', 'purchase')->where('status', 'paid')->exists();
+                if ($demo !== ($mode === 'sandbox')) {
+                    throw ValidationException::withMessages(['payment' => 'Mode pembayaran tidak sesuai dengan jenis lisensi. Gunakan sandbox untuk key demo dan production untuk key produksi.']);
+                }
+            }
             if ($locked->gateway_status) {
                 throw ValidationException::withMessages(['payment' => 'Permintaan pembayaran sebelumnya sudah dikirim. Jangan bayar ulang; tunggu rekonsiliasi atau hubungi admin dengan nomor pesanan.']);
             }
