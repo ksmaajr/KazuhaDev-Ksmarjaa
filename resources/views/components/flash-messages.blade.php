@@ -1,0 +1,2 @@
+@if(session('success'))<div class="notice success" role="status" data-flash-feedback="success" data-feedback-title="Berhasil"><x-icon name="check" size="18"/><span data-feedback-message>{{ session('success') }}</span></div>@endif
+@if($errors->any())<div class="notice error" role="alert" data-flash-feedback="error" data-feedback-title="Periksa kembali"><x-icon name="shield" size="18"/><div data-feedback-message>@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div></div>@endif

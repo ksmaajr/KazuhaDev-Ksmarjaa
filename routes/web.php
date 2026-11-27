@@ -1,0 +1,84 @@
+<?php
+
+use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FinanceController;
+use App\Http\Controllers\GameController;
+use App\Http\Controllers\LicenseController;
+use App\Http\Controllers\MemberController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PaymentSettingsController;
+use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\RecordDetailsController;
+use App\Http\Controllers\SettingController;
+use App\Http\Controllers\StorefrontController;
+use App\Http\Middleware\AuthenticateMember;
+use App\Http\Middleware\EnsureAdmin;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/game-artwork/{game}/{kind}', [GameController::class, 'artwork'])->where('kind', 'banner|logo')->name('games.artwork');
+Route::get('/', [StorefrontController::class, 'index'])->name('home');
+Route::get('/shop', [StorefrontController::class, 'index'])->name('shop');
+Route::post('/checkout', [StorefrontController::class, 'checkout'])->middleware('throttle:10,1')->name('checkout.store');
+Route::get('/checkout/{order:number}', [StorefrontController::class, 'receipt'])->name('checkout.receipt');
+Route::get('/checkout/{order:number}/status', [StorefrontController::class, 'status'])->middleware('throttle:60,1')->name('checkout.status');
+Route::post('/checkout/{order:number}/payment', [StorefrontController::class, 'payment'])->middleware('throttle:10,1')->name('checkout.payment');
+Route::middleware('guest')->group(function (): void {
+    Route::get('/login', [AuthController::class, 'create'])->name('login');
+    Route::post('/login', [AuthController::class, 'store'])->middleware('throttle:admin-login')->name('login.store');
+});
+Route::middleware(['auth', EnsureAdmin::class])->group(function (): void {
+    Route::get('/payment-settings', [PaymentSettingsController::class, 'edit'])->name('payments.settings');
+    Route::put('/payment-settings', [PaymentSettingsController::class, 'update'])->name('payments.settings.update');
+    Route::get('/finance', [FinanceController::class, 'index'])->name('finance.index');
+    Route::get('/finance/export', [FinanceController::class, 'export'])->middleware('throttle:10,1')->name('finance.export');
+    Route::post('/finance', [FinanceController::class, 'store'])->name('finance.store');
+    Route::post('/finance/{transaction}/void', [FinanceController::class, 'void'])->name('finance.void');
+    Route::get('/products', [PurchaseController::class, 'products'])->name('products.index');
+    Route::get('/records/{kind}/{id}', [RecordDetailsController::class, 'admin'])->whereNumber('id')->name('records.show');
+    Route::get('/orders', [PurchaseController::class, 'index'])->name('orders.index');
+    Route::post('/products', [PurchaseController::class, 'product'])->name('products.store');
+    Route::put('/products/{product}', [PurchaseController::class, 'updateProduct'])->name('products.update');
+    Route::post('/products/{product}/toggle', [PurchaseController::class, 'toggle'])->name('products.toggle');
+    Route::post('/orders/{order}/settle', [PurchaseController::class, 'settle'])->middleware('throttle:30,1')->name('orders.settle');
+    Route::post('/orders/{order}/cancel', [PurchaseController::class, 'cancel'])->name('orders.cancel');
+    Route::delete('/orders/{order}', [PurchaseController::class, 'destroy'])->name('orders.destroy');
+    Route::get('/notifications', [NotificationController::class, 'admin'])->name('notifications.admin');
+    Route::get('/games', [GameController::class, 'index'])->name('games.index');
+    Route::post('/games', [GameController::class, 'store'])->middleware('throttle:20,1')->name('games.store');
+    Route::put('/games/{game}', [GameController::class, 'update'])->middleware('throttle:20,1')->name('games.update');
+    Route::get('/games/{game}/downloads/{kind}', [GameController::class, 'download'])->where('kind', 'injector|dll')->name('games.download');
+    Route::get('/admins', [AdminUserController::class, 'index'])->name('admins.index');
+    Route::post('/admins', [AdminUserController::class, 'store'])->middleware('throttle:10,1')->name('admins.store');
+    Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/licenses', [DashboardController::class, 'index'])->name('licenses');
+    Route::post('/licenses', [LicenseController::class, 'store'])->name('licenses.store');
+    Route::post('/licenses/{license}/reset-hwid', [LicenseController::class, 'reset'])->name('licenses.reset');
+    Route::put('/licenses/{license}', [LicenseController::class, 'update'])->name('licenses.update');
+    Route::delete('/licenses/{license}', [LicenseController::class, 'destroy'])->name('licenses.destroy');
+    Route::post('/licenses/{license}/extend', [LicenseController::class, 'extend'])->name('licenses.extend');
+    Route::post('/licenses/{license}/revoke', [LicenseController::class, 'revoke'])->name('licenses.revoke');
+    Route::get('/activity', [DashboardController::class, 'activity'])->name('activity');
+    Route::get('/api-console', [DashboardController::class, 'api'])->name('api.console');
+    Route::get('/settings', [SettingController::class, 'edit'])->name('settings');
+    Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+});
+
+Route::get('/member/login', [MemberController::class, 'login'])->name('member.login');
+Route::post('/member/login', [MemberController::class, 'authenticate'])->middleware('throttle:member-login')->name('member.authenticate');
+Route::middleware(AuthenticateMember::class)->group(function (): void {
+    Route::get('/member/records/{kind}/{id}', [RecordDetailsController::class, 'member'])->whereNumber('id')->name('member.records.show');
+    Route::get('/member/renew', [StorefrontController::class, 'renew'])->name('member.renew');
+    Route::post('/member/renew', [StorefrontController::class, 'renewOrder'])->middleware('throttle:10,1')->name('member.renew.store');
+    Route::get('/member/shop', [PurchaseController::class, 'shop'])->name('member.shop');
+    Route::post('/member/orders', [PurchaseController::class, 'order'])->middleware('throttle:10,1')->name('member.orders.store');
+    Route::post('/member/orders/{order}/cancel', [PurchaseController::class, 'memberCancel'])->middleware('throttle:10,1')->name('member.orders.cancel');
+    Route::get('/member/notifications', [NotificationController::class, 'member'])->name('notifications.member');
+    Route::get('/member/games/{game}/downloads/{kind}', [GameController::class, 'download'])->where('kind', 'injector')->middleware('throttle:30,1')->name('member.games.download');
+    Route::get('/member', [MemberController::class, 'dashboard'])->name('member.dashboard');
+    Route::get('/member/status', [MemberController::class, 'status'])->name('member.status');
+    Route::post('/member/logout', [MemberController::class, 'logout'])->name('member.logout');
+    Route::post('/member/reset-hwid', [MemberController::class, 'reset'])->middleware('throttle:member-reset')->name('member.reset');
+});

@@ -1,0 +1,1 @@
+<button type="button" class="theme-switch" data-theme-toggle aria-label="Gunakan light mode" title="Ganti tema"><span class="theme-sun"><x-icon name="sun" size="16"/></span><span class="theme-moon"><x-icon name="moon" size="16"/></span><span data-theme-label>Light mode</span></button>

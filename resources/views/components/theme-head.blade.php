@@ -1,0 +1,1 @@
+<script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}" src="{{ asset('theme.js') }}"></script><meta name="theme-color" content="#1b1221" media="(prefers-color-scheme: dark)"><meta name="theme-color" content="#fff7fc" media="(prefers-color-scheme: light)">
