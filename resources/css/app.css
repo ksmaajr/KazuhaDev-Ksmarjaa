@@ -268,3 +268,12 @@ body{font-size:15px}.page-heading p,.panel-heading p{line-height:1.85}.btn{min-h
 .kz-auth-track{padding:10px 0}
 .kz-auth-form-wrap{padding:10px 0}
 }
+
+/* Admin-only typography; preserve the shared application font. */
+.kz-auth{font-family:'Manrope','Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif}
+.kz-auth button,.kz-auth input{font-family:inherit}
+.kz-auth-story h1{font-weight:700;letter-spacing:-.045em;line-height:1.1}
+.kz-auth-form-intro h2{font-weight:700;letter-spacing:-.04em}
+.kz-auth-wordmark{font-weight:700;letter-spacing:-.045em}
+.kz-auth-description,.kz-auth-story>p{font-weight:400}
+.kz-auth-field label,.kz-auth-submit{font-weight:600}
