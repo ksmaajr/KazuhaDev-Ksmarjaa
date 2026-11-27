@@ -48,7 +48,7 @@
                     @if($order->gateway_payment_url && $order->gateway_status==='pending')
                         <div class="checkout-pay-area"><span class="eyebrow"><x-icon name="receipt" size="14"/> INVOICE SIAP</span><p>Lanjutkan ke halaman SumoPod. Gunakan invoice yang sama jika halaman pembayaran tertutup.</p><a class="btn primary full" href="{{ $order->gateway_payment_url }}" target="_blank" rel="noopener noreferrer"><x-icon name="wallet" size="16"/> Lanjutkan pembayaran QRIS <x-icon name="arrow" size="17"/></a><small>Kedaluwarsa {{ $order->gateway_expires_at?->timezone('Asia/Jakarta')->format('d M Y H:i') ?? 'mengikuti invoice' }} WIB</small></div>
                     @elseif(!$order->gateway_status && $gatewayReady)
-                        <form class="checkout-pay-area" method="post" action="{{ route('checkout.payment',$order) }}" data-once>@csrf<span class="eyebrow"><x-icon name="wallet" size="14"/> PILIH METODE PEMBAYARAN</span><div class="studio-method"><span class="studio-method-icon"><x-icon name="wallet" size="24"/></span><div><strong>QRIS</strong><small>Bayar melalui aplikasi yang mendukung QRIS</small></div></div><label for="checkout-method"><x-icon name="wallet" size="14"/> Metode</label><select id="checkout-method" name="method"><option value="QRIS">QRIS · semua aplikasi pembayaran</option>@if($gatewayMode==='sandbox')<option value="QRIS_INSTANT">QRIS Instant · demo</option>@endif</select><button class="btn primary full" type="submit"><x-icon name="receipt" size="16"/> Lanjutkan ke pembayaran <x-icon name="arrow" size="17"/></button><p class="field-help">Nominal mengikuti pesanan server. Klik ganda tidak membuat invoice baru.</p></form>
+                        <form class="checkout-pay-area" method="post" action="{{ route('checkout.payment',$order) }}" data-once>@csrf<span class="eyebrow"><x-icon name="wallet" size="14"/> PILIH METODE PEMBAYARAN</span><fieldset class="studio-method-options"><legend>Metode pembayaran</legend><label class="studio-method-choice"><input type="radio" name="method" value="QRIS" checked required><span class="studio-method-icon"><x-icon name="wallet" size="24"/></span><span class="studio-method-copy"><strong>QRIS</strong><small>Semua aplikasi pembayaran QRIS</small></span><span class="studio-method-check" aria-hidden="true"><x-icon name="check" size="15"/></span></label>@if($gatewayMode==='sandbox')<label class="studio-method-choice"><input type="radio" name="method" value="QRIS_INSTANT"><span class="studio-method-icon"><x-icon name="sparkles" size="24"/></span><span class="studio-method-copy"><strong>QRIS Instant <small class="studio-demo-tag">DEMO</small></strong><small>Simulasi pembayaran instan</small></span><span class="studio-method-check" aria-hidden="true"><x-icon name="check" size="15"/></span></label>@endif</fieldset><button class="btn primary full" type="submit"><x-icon name="receipt" size="16"/> Lanjutkan ke pembayaran <x-icon name="arrow" size="17"/></button><p class="field-help">Nominal mengikuti pesanan server. Klik ganda tidak membuat invoice baru.</p></form>
                     @elseif(!$gatewayReady && !$order->gateway_status)
                         <div class="invoice-notice is-warning" role="status"><x-icon name="info" size="20"/><div><strong>Pembayaran belum siap</strong><p>{{ $gatewayIssue }} Pesanan Anda tersimpan; hubungi admin dan sertakan nomor pesanan. Setelah konfigurasi lengkap, muat ulang halaman ini untuk memilih metode pembayaran.</p></div></div>
                     @else
@@ -107,5 +107,21 @@
 .checkout-studio .studio-member-action{margin-top:20px}.checkout-studio .studio-member-action .btn{min-height:50px;border-radius:12px;justify-content:center;font-size:14px}.checkout-studio .studio-member-action .field-help{margin:10px 0 0;text-align:center}
 .checkout-studio .invoice-summary,.checkout-studio .invoice-payment{display:flex;flex-direction:column}
 @media(min-width:801px){.checkout-studio .invoice-summary .invoice-assurance{margin-top:auto}.checkout-studio .invoice-summary .invoice-facts{margin-bottom:18px}}
+ 
+.checkout-studio .studio-method-options{border:0;padding:0;margin:14px 0 18px;min-width:0;display:grid;gap:10px}
+.checkout-studio .studio-method-options legend{font-size:12px;color:var(--muted);margin-bottom:10px}
+.checkout-studio .checkout-pay-area .studio-method-choice{position:relative;display:flex;align-items:center;gap:12px;margin:0;padding:15px;border:1px solid var(--line);border-radius:14px;background:var(--soft);cursor:pointer;transition:border-color .18s,background .18s}
+.checkout-studio .studio-method-choice:hover{border-color:var(--mint)}
+.checkout-studio .studio-method-choice:has(input:checked){border-color:var(--mint);background:var(--mint-bg);box-shadow:0 0 0 1px var(--mint)}
+.checkout-studio .studio-method-choice:has(input:focus-visible){outline:2px solid var(--mint);outline-offset:4px}
+.checkout-studio .studio-method-choice input{position:absolute;width:1px;height:1px;min-height:0;padding:0;opacity:0}
+.checkout-studio .studio-method-copy{flex:1;min-width:0}
+.checkout-studio .studio-method-copy strong{display:block;font-size:14px;color:var(--text)}
+.checkout-studio .studio-method-copy>small{display:block;font-size:12px;color:var(--muted);margin-top:3px}
+.checkout-studio .studio-demo-tag{display:inline-block;font-size:9px;letter-spacing:.08em;color:var(--mint);margin-left:5px}
+.checkout-studio .studio-method-check{display:grid;place-items:center;width:24px;height:24px;border:1px solid var(--line);border-radius:50%;flex-shrink:0}
+.checkout-studio .studio-method-check svg{opacity:0}
+.checkout-studio .studio-method-choice:has(input:checked) .studio-method-check{background:var(--mint);color:#25182b;border-color:var(--mint)}
+.checkout-studio .studio-method-choice:has(input:checked) .studio-method-check svg{opacity:1}
 </style>
 </x-public-layout>
