@@ -65,7 +65,7 @@ class SumoPodWebhookController extends Controller
                             'notes' => 'Sandbox: portal member testing only.',
                             'hours' => intdiv($seconds, 3600),
                             'minutes' => intdiv($seconds % 3600, 60),
-                            'game_ids' => [],
+                            'game_ids' => $order->game_ids ?? [],
                         ], null, $request->ip());
                     }
                     $order->update(['status' => 'paid', 'gateway_status' => 'completed', 'gateway_fee' => (int) $data['fee'], 'paid_at' => CarbonImmutable::parse($data['paid_at'])->utc(), 'verified_at' => now(), 'payment_reference' => 'sandbox:'.$data['payment_id'], 'issued_license_id' => $license?->id, 'payment_notes' => 'Simulasi sandbox; key demo hanya untuk portal member, tanpa perpanjangan produksi atau pendapatan riil.']);
