@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\MemberLoginRequest;
 use App\Models\LicenseKey;
+use App\Models\LicenseProduct;
+use App\Models\PurchaseOrder;
 use App\Models\Setting;
 use App\Services\LicenseService;
 use Illuminate\Http\JsonResponse;
@@ -34,7 +36,13 @@ class MemberController extends Controller
     {
         $license = $request->attributes->get('member_license');
 
-        return view('member.dashboard', ['license' => $license->load('games'), 'renewalUrl' => Setting::renewalUrl($license)]);
+        $license->load('games');
+        $access = $license->games->pluck('id')->map(fn ($id) => (int) $id)->sort()->values()->all();
+        $renewalProducts = LicenseProduct::where('is_active', true)->orderBy('price')->get()
+            ->filter(fn ($product) => collect($product->game_ids)->map(fn ($id) => (int) $id)->sort()->values()->all() === $access)->values();
+        $renewalInvoices = PurchaseOrder::where('owner_license_id', $license->id)->where('purpose', 'renewal')->where('status', 'pending')->orderByDesc('id')->get();
+
+        return view('member.dashboard', ['license' => $license, 'renewalUrl' => Setting::renewalUrl($license), 'renewalProducts' => $renewalProducts, 'renewalInvoices' => $renewalInvoices]);
     }
 
     public function status(Request $request): JsonResponse
