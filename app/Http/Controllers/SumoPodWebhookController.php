@@ -56,7 +56,19 @@ class SumoPodWebhookController extends Controller
                 abort_unless($order->status === 'pending' && $data['status'] === 'completed' && (int) $data['fee'] + (int) $data['net_amount'] === $order->amount, 409, 'Payment totals or state mismatch.');
                 abort_if(CarbonImmutable::parse($data['paid_at'])->gt(now()->addMinutes(5)), 422, 'Invalid payment timestamp.');
                 if ($mode === 'sandbox') {
-                    $order->update(['status' => 'paid', 'gateway_status' => 'completed', 'gateway_fee' => (int) $data['fee'], 'paid_at' => CarbonImmutable::parse($data['paid_at'])->utc(), 'verified_at' => now(), 'payment_reference' => 'sandbox:'.$data['payment_id'], 'payment_notes' => 'Simulasi sandbox; tidak menerbitkan key, memperpanjang lisensi, atau mencatat pendapatan riil.']);
+                    $license = null;
+                    if ($order->purpose !== 'renewal') {
+                        $seconds = $order->duration_seconds ?? $order->days * 86400;
+                        [$license] = app(\App\Services\LicenseService::class)->issue([
+                            'label' => '[DEMO] '.$order->product_name.' · '.$order->number,
+                            'member_name' => $order->member_name,
+                            'notes' => 'Sandbox: portal member testing only.',
+                            'hours' => intdiv($seconds, 3600),
+                            'minutes' => intdiv($seconds % 3600, 60),
+                            'game_ids' => [],
+                        ], null, $request->ip());
+                    }
+                    $order->update(['status' => 'paid', 'gateway_status' => 'completed', 'gateway_fee' => (int) $data['fee'], 'paid_at' => CarbonImmutable::parse($data['paid_at'])->utc(), 'verified_at' => now(), 'payment_reference' => 'sandbox:'.$data['payment_id'], 'issued_license_id' => $license?->id, 'payment_notes' => 'Simulasi sandbox; key demo hanya untuk portal member, tanpa perpanjangan produksi atau pendapatan riil.']);
                     LicenseEvent::create(['license_key_id' => $order->owner_license_id, 'action' => 'payment_test_completed', 'metadata' => ['order_number' => $order->number, 'mode' => 'sandbox']]);
 
                     return;
