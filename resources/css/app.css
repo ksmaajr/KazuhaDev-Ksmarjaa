@@ -778,3 +778,22 @@ body{font-size:15px}.page-heading p,.panel-heading p{line-height:1.85}.btn{min-h
 .gm-identity-section input{width:100%}
 .gm-identity-section .field-help{margin-bottom:0}
 @media(max-width:480px){.gm-identity-heading .gm-symbol{width:37px;height:37px}.gm-identity-heading h2{font-size:18px}.gm-identity-section{padding:10px}}
+
+/* Catalog identity form: scoped visual refinement, existing release controls unchanged. */
+.gm-editor-v3 .gm-identity-heading{padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:16px;gap:12px}
+.gm-editor-v3 .gm-identity-heading .gm-symbol{width:46px;height:46px;border:1px solid var(--line);border-radius:12px}
+.gm-editor-v3 .gm-identity-heading h2{font-family:'Manrope','Plus Jakarta Sans',system-ui,sans-serif;font-size:clamp(18px,2vw,23px);line-height:1.3;letter-spacing:-.04em}
+.gm-editor-v3 .gm-identity-heading .eyebrow{font-size:10px;letter-spacing:1px;overflow-wrap:anywhere}
+.gm-editor-v3 .gm-identity-section{padding:16px;border-radius:12px;background:var(--panel);margin:0 0 16px}
+.gm-identity-caption{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.gm-identity-icon{display:grid;place-items:center;width:34px;height:34px;border:1px solid var(--line);border-radius:8px;background:var(--mint-bg);color:var(--mint);flex:none}
+.gm-editor-v3 .gm-identity-caption h3{margin:0 0 3px;font-size:14px;line-height:1.4}
+.gm-identity-caption p{font-size:11px;color:var(--muted);margin:0;line-height:1.5}
+.gm-identity-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.gm-identity-grid>div{min-width:0}
+.gm-editor-v3 .gm-identity-grid label,.gm-readonly-label{display:block;font-size:12px;font-weight:600;margin:0 0 6px}
+.gm-editor-v3 .gm-identity-grid input,.gm-readonly-code{box-sizing:border-box;min-height:42px;border-radius:8px;width:100%;font-size:13px}
+.gm-readonly-code{display:flex;align-items:center;padding:10px 12px;background:var(--soft);border:1px solid var(--line);color:var(--muted);overflow-wrap:anywhere;white-space:normal}
+.gm-editor-v3 .gm-identity-section .field-help{font-size:11px;line-height:1.55;margin:9px 0 0}
+.gm-editor-v3 .gm-identity-grid input:focus-visible{outline:2px solid var(--mint);outline-offset:1px}
+@media(max-width:600px){.gm-identity-grid{grid-template-columns:minmax(0,1fr)}.gm-editor-v3 .gm-identity-section{padding:12px}.gm-editor-v3 .gm-identity-heading .gm-symbol{width:38px;height:38px}}
