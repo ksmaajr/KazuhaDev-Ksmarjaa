@@ -11,6 +11,19 @@ class AdminLicenseActionsTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_package_issuance_records_catalog_price_once_per_license(): void
+    {
+        $product = \App\Models\LicenseProduct::factory()->create(['price' => 75000]);
+        $this->actingAs(User::factory()->create())->post('/licenses', [
+            'member_name' => 'Buyer', 'label' => 'Package sale', 'product_id' => $product->id, 'price' => 1,
+        ])->assertSessionHasNoErrors();
+        $license = \App\Models\LicenseKey::where('label', 'Package sale')->firstOrFail();
+        $this->assertDatabaseHas('financial_transactions', ['reference' => 'LIC-MAN-'.$license->id, 'amount' => 75000, 'direction' => 'income', 'source' => 'manual', 'status' => 'posted']);
+        $this->assertDatabaseCount('financial_transactions', 1);
+        $this->post('/licenses', ['member_name' => 'Custom', 'label' => 'Custom key', 'days' => 1, 'game_ids' => $product->game_ids])->assertSessionHasNoErrors();
+        $this->assertDatabaseCount('financial_transactions', 1);
+    }
+
     private function issue(): array
     {
         return app(LicenseService::class)->issue(['label' => 'Original', 'days' => 7], null, '127.0.0.1');

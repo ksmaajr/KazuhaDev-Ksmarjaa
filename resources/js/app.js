@@ -244,7 +244,9 @@ function applyLicensePackage(form) {
     }
     fields.classList.toggle('is-package', chosen);
     fields.querySelectorAll('input,button').forEach(input => { input.disabled = chosen; });
-    form.querySelector('[data-lk-package-hint]').textContent = chosen ? 'Durasi dan akses game mengikuti paket terpilih. Pilih Custom untuk mengubahnya.' : 'Atur durasi dan akses game secara manual. Tidak membuat invoice.';
+    form.querySelector('[data-lk-package-hint]').textContent = chosen ? 'Durasi dan akses game mengikuti paket. Harga katalog dicatat sebagai pemasukan manual, tanpa invoice.' : 'Atur durasi dan akses game secara manual. Tidak mencatat pemasukan.';
+    const finance = form.querySelector('[data-lk-finance-label]');
+    if (finance) finance.textContent = chosen && Number(option.dataset.price)>0 ? 'Pemasukan manual: Rp '+Number(option.dataset.price).toLocaleString('id-ID') : 'Penerbitan manual · tanpa pemasukan';
     syncLicensePreview(form);
 }
 function initializeLicenseCreation() {

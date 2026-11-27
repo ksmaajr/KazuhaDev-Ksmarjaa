@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Game;
+use App\Models\FinancialTransaction;
 use App\Models\LicenseEvent;
 use App\Models\LicenseKey;
 use App\Models\PurchaseOrder;
@@ -20,7 +21,23 @@ class LicenseService
             $duration = LicenseDuration::seconds($data);
             $license = LicenseKey::create(['label' => $data['label'], 'member_name' => $data['member_name'] ?? $data['label'], 'notes' => $data['notes'] ?? null, 'key_hash' => hash('sha256', $plain), 'key_hint' => 'KF-'.substr($plain, 3, 4).'••••'.substr($plain, -4), 'duration_seconds' => $duration, 'key_value' => $plain, 'expires_at' => null]);
             $license->games()->sync($data['game_ids'] ?? [Game::where('code', 'rules-of-survival')->firstOrFail()->id]);
-            $this->record($license, 'created', $ip, null, $actorId, ['game_ids' => $license->games()->allRelatedIds()->all(), 'issued_package' => $package, 'issuance_source' => 'manual']);
+            $reference = null;
+            if ($package !== null && (int) $package['price'] > 0) {
+                $reference = 'LIC-MAN-'.$license->id;
+                FinancialTransaction::create([
+                    'reference' => $reference,
+                    'created_by' => $actorId,
+                    'direction' => 'income',
+                    'source' => 'manual',
+                    'status' => 'posted',
+                    'amount' => (int) $package['price'],
+                    'fee' => 0,
+                    'currency' => 'IDR',
+                    'description' => 'Penerbitan manual lisensi #'.$license->id.' · '.$package['name'],
+                    'paid_at' => now(),
+                ]);
+            }
+            $this->record($license, 'created', $ip, null, $actorId, ['game_ids' => $license->games()->allRelatedIds()->all(), 'issued_package' => $package, 'issuance_source' => 'manual', 'reference' => $reference]);
 
             return [$license, $plain];
         });

@@ -146,6 +146,12 @@ class RecordDetailsController extends Controller
                         ->latest('id')->first();
                     $add('Paket penerbitan', $purchase?->product_name ?? ($snapshot['name'] ?? (($created?->metadata['issuance_source'] ?? null) === 'manual' ? 'Custom / tanpa paket' : 'Tidak tercatat')));
                     $add('Sumber penerbitan', $purchase ? 'Pembelian terverifikasi' : ($created?->user_id ? 'Administrator' : 'Tidak tercatat'));
+                    $ledger = FinancialTransaction::where('reference', 'LIC-MAN-'.$record->id)->first();
+                    if ($ledger) {
+                        $add('Harga penerbitan', 'Rp '.number_format($ledger->amount, 0, ',', '.'));
+                        $add('Status pencatatan keuangan', $ledger->status === 'posted' ? 'Tercatat manual' : 'Void');
+                        $link('Lihat transaksi penerbitan', 'transaction', $ledger->id);
+                    }
                     $add('Durasi paket awal', $purchase ? LicenseDuration::label($purchase->duration_seconds ?? $purchase->days * 86400) : (isset($snapshot['duration_seconds']) ? LicenseDuration::label($snapshot['duration_seconds']) : null));
                     $add('Paket perpanjangan terakhir', $renewal?->product_name);
                     $add('Diterbitkan oleh', $created?->user_id ? User::find($created->user_id)?->name : null);

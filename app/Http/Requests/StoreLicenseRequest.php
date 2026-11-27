@@ -41,7 +41,7 @@ class StoreLicenseRequest extends FormRequest
             throw ValidationException::withMessages(['product_id' => 'Konfigurasi paket tidak valid. Periksa durasi dan game.']);
         }
 
-        $this->issuedPackage = ['id' => $product->id, 'name' => $product->name, 'duration_seconds' => $seconds, 'game_ids' => $ids];
+        $this->issuedPackage = ['id' => $product->id, 'name' => $product->name, 'price' => $product->price, 'duration_seconds' => $seconds, 'game_ids' => $ids];
         $this->offsetUnset('days');
         $this->merge([
             'hours' => intdiv($seconds, 3600),
