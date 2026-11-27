@@ -167,3 +167,39 @@ window.addEventListener('pageshow',()=>document.querySelectorAll('form[data-once
 let paymentChecking=false;
 async function checkPayment(){const watch=document.querySelector('[data-payment-watch]');if(!watch||watch.dataset.orderStatus!=='pending'||paymentChecking||document.hidden)return;paymentChecking=true;const label=watch.querySelector('[data-payment-poll-label]');try{const response=await fetch(watch.dataset.paymentWatch,{headers:{Accept:'application/json'},cache:'no-store',signal:AbortSignal.timeout(8000)});if(!response.ok)throw Error();const data=await response.json();if(!watch.isConnected)return;if(data.status!==watch.dataset.orderStatus||data.gateway_status!==(watch.dataset.gatewayStatus||null)){await loadView(getViewUrl(),{historyMode:'none'});return;}if(label)label.textContent='Status diperiksa · '+new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date());}catch{if(label)label.textContent='Koneksi terputus · pesanan tersimpan, jangan bayar ulang';}finally{paymentChecking=false;}}
 document.addEventListener('click',event=>{if(event.target.closest('[data-payment-refresh]'))checkPayment();});setInterval(checkPayment,10000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkPayment();});
+
+// Admin sign-in enhancements; native form submission remains the fallback.
+const adminSignIn = document.querySelector('[data-kz-auth-form]');
+if (adminSignIn) {
+    const password = adminSignIn.querySelector('#password');
+    const reveal = adminSignIn.querySelector('#password-toggle');
+    const caps = adminSignIn.querySelector('[data-kz-caps]');
+    const submit = adminSignIn.querySelector('button[type="submit"]');
+    const label = adminSignIn.querySelector('[data-kz-submit-label]');
+    const status = adminSignIn.querySelector('[data-kz-auth-status]');
+    const updateCaps = event => { caps.hidden = !event.getModifierState('CapsLock'); };
+    password.addEventListener('keydown', updateCaps);
+    password.addEventListener('keyup', updateCaps);
+    password.addEventListener('blur', () => { caps.hidden = true; });
+    // The shared password toggle already handles visibility.
+    reveal.addEventListener('click', () => {
+        reveal.setAttribute('aria-pressed', String(password.type === 'text'));
+    });
+    let submitting = false;
+    adminSignIn.addEventListener('submit', event => {
+        if (event.defaultPrevented) return;
+        if (submitting) { event.preventDefault(); return; }
+        submitting = true;
+        submit.disabled = true;
+        submit.setAttribute('aria-busy', 'true');
+        label.textContent = 'Memproses akses…';
+        status.textContent = 'Sedang masuk ke workspace.';
+    });
+    window.addEventListener('pageshow', () => {
+        submitting = false;
+        submit.disabled = false;
+        submit.removeAttribute('aria-busy');
+        label.textContent = 'Masuk ke dashboard';
+        status.textContent = '';
+    });
+}
