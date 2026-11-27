@@ -37,9 +37,7 @@ class MemberController extends Controller
         $license = $request->attributes->get('member_license');
 
         $license->load('games');
-        $access = $license->games->pluck('id')->map(fn ($id) => (int) $id)->sort()->values()->all();
-        $renewalProducts = LicenseProduct::where('is_active', true)->orderBy('price')->get()
-            ->filter(fn ($product) => collect($product->game_ids)->map(fn ($id) => (int) $id)->sort()->values()->all() === $access)->values();
+        $renewalProducts = LicenseProduct::where('is_active', true)->orderBy('price')->get();
         $renewalInvoices = PurchaseOrder::where('owner_license_id', $license->id)->where('purpose', 'renewal')->where('status', 'pending')->orderByDesc('id')->get();
 
         return view('member.dashboard', ['license' => $license, 'renewalUrl' => Setting::renewalUrl($license), 'renewalProducts' => $renewalProducts, 'renewalInvoices' => $renewalInvoices]);
