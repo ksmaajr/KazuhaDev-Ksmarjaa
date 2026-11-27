@@ -551,3 +551,36 @@ body{font-size:15px}.page-heading p,.panel-heading p{line-height:1.85}.btn{min-h
 .lk-device-link:focus-visible,.lk-row-actions button:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
 @media(max-width:1100px){.lk-directory-table{min-width:820px}.lk-directory-table tbody td{padding:12px 10px}.lk-directory-table thead th{padding:10px}}
 @media(prefers-reduced-motion:reduce){.lk-directory-table *, .lk-directory-table tr{transition:none!important}}
+
+/* License visual language: purposeful iconography and semantic accents. */
+.license-insight .insight-identity{display:flex;align-items:center;gap:13px;min-width:0}
+.insight-identity>div{min-width:0}
+.insight-symbol{display:inline-grid;place-items:center;width:32px;height:32px;border:1px solid color-mix(in srgb,var(--mint) 22%,var(--line));border-radius:9px;background:var(--mint-bg);color:var(--mint);flex:none}
+.insight-symbol.identity-symbol{width:52px;height:52px;border-radius:13px}
+.identity-symbol svg{width:25px;height:25px}
+.insight-overline{display:block;font-size:9px;letter-spacing:1.4px;font-weight:700;color:var(--mint)}
+.insight-key-hint{font-size:10px;color:var(--muted);overflow-wrap:anywhere}
+.license-insight .detail-subtitle{margin:3px 0}
+.license-insight .detail-intro{background:linear-gradient(115deg,color-mix(in srgb,var(--mint) 8%,var(--panel)),var(--panel));padding:15px}
+.license-insight .detail-fact-card{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:7px;overflow:hidden;transition:border-color .2s,transform .2s;background:linear-gradient(145deg,var(--soft),var(--panel))}
+.license-insight .detail-fact-card:hover{border-color:var(--mint);transform:translateY(-2px)}
+.license-insight .detail-fact-card>.insight-symbol{width:31px;height:31px;margin-bottom:2px}
+.license-insight .detail-fact-card[data-insight-tone="clock"]>.insight-symbol{color:#d5ad74;background:#d5ad7414;border-color:#d5ad7433}
+.license-insight .detail-fact-card[data-insight-tone="device"]>.insight-symbol{color:#82b9d6;background:#82b9d614;border-color:#82b9d633}
+.license-insight .detail-fact-card[data-insight-tone="activity"]>.insight-symbol{color:#9fcab4;background:#9fcab414;border-color:#9fcab433}
+[data-theme="light"] .license-insight .detail-fact-card[data-insight-tone="clock"]>.insight-symbol{color:#86591f}
+[data-theme="light"] .license-insight .detail-fact-card[data-insight-tone="device"]>.insight-symbol{color:#316a89}
+[data-theme="light"] .license-insight .detail-fact-card[data-insight-tone="activity"]>.insight-symbol{color:#346f50}
+.license-insight .detail-group-heading{display:flex;align-items:center;gap:9px}
+.license-insight .detail-group-heading .insight-symbol{width:28px;height:28px;border-radius:7px}
+.license-insight .detail-group-heading .insight-symbol svg{width:16px;height:16px}
+.license-detail-field dt{display:flex;align-items:center;gap:6px}
+.license-detail-field dt svg{width:14px;height:14px;color:var(--mint)}
+.license-detail-field.wide{background:linear-gradient(90deg,var(--soft),var(--panel))}
+.license-insight .detail-tab.is-active{box-shadow:inset 0 -2px var(--mint)}
+.lk-directory-table .lk-th{display:inline-flex;align-items:center;gap:7px;text-transform:uppercase}
+.lk-th svg{color:var(--mint);flex:none}
+.lk-directory-table .table-key-icon{background:var(--mint-bg);color:var(--mint);border:1px solid var(--line);border-radius:8px}
+.lk-directory-table .expiry-date svg{display:inline-block;vertical-align:-2px;color:var(--mint);margin-right:3px}
+.lk-directory-table .badge{border-radius:6px;padding:5px 8px}
+@media(prefers-reduced-motion:reduce){.license-insight .detail-fact-card:hover{transform:none}}
