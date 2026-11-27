@@ -340,3 +340,19 @@ for (const eventName of ['input','change','click']) {
         }
     });
 }
+
+function updateFinancePreview(form){
+ const get=name=>form.querySelector('[name="'+name+'"]')?.value||'';
+ const amount=Number(get('amount'))||0,fee=Number(get('fee'))||0;
+ const net=get('direction')==='expense'?-amount:amount-fee;
+ form.querySelector('[data-fin-net]').textContent=(net<0?'−':'')+'Rp '+Math.abs(net).toLocaleString('id-ID');
+}
+for(const eventName of ['input','change','click']){
+ document.addEventListener(eventName,event=>{
+ const form=event.target.closest('[data-fin-editor]');
+ if(form)updateFinancePreview(form);
+ if(eventName==='click'&&event.target.closest('[data-open-dialog="record-transaction"]')){
+ const editor=document.querySelector('[data-fin-editor]');if(editor)updateFinancePreview(editor);
+ }
+ });
+}
