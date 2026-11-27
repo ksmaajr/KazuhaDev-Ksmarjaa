@@ -108,7 +108,7 @@ class StorefrontController extends Controller
     public function payment(Request $request, PurchaseOrder $order, SumoPodService $service): RedirectResponse
     {
         $this->authorizeOrder($request, $order);
-        $data = $request->validate(['method' => ['required', 'in:QRIS,QRIS_INSTANT']]);
+        $data = $request->validate(['method' => ['required', 'in:QRIS,QRIS_INSTANT'], 'accept_terms' => ['accepted']], ['accept_terms.accepted' => 'Anda wajib menyetujui Syarat & Ketentuan sebelum melanjutkan pembayaran.']);
         $invoice = $service->createLink($order, $data['method']);
         if ($invoice->gateway_payment_id) {
             $request->session()->put('payment_return_order', $invoice->number);
