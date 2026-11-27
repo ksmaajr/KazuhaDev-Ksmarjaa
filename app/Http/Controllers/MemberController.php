@@ -16,8 +16,14 @@ use Illuminate\View\View;
 
 class MemberController extends Controller
 {
-    public function login(): View
+    public function login(Request $request): View|RedirectResponse
     {
+        $license = LicenseKey::find($request->session()->get('member_license_id'));
+        if ($license && ! $license->revoked_at) {
+            return redirect()->route('member.dashboard');
+        }
+        $request->session()->forget('member_license_id');
+
         return view('member.login');
     }
 
