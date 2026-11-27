@@ -29,8 +29,16 @@ body.member-auth-v4{--ma-bg:#110e17;--ma-panel:#1c1725;--ma-line:#40334c;--ma-te
 @keyframes ma-enter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}@keyframes ma-spin{to{transform:rotate(360deg)}}@keyframes ma-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}@keyframes ma-ambient{0%,100%{transform:translate(0,0)}50%{transform:translate(-35px,-24px)}}@keyframes ma-pulse{0%,100%{box-shadow:0 0 0 3px #edb4dc20}50%{box-shadow:0 0 0 7px #edb4dc12}}@keyframes ma-sweep{0%{transform:translateX(-110%)}45%,100%{transform:translateX(110%)}}
 @media(max-width:850px){.ma-main{grid-template-columns:1fr;max-height:none;min-height:0;flex:1}.ma-auth-panel{grid-row:1;padding:32px 22px}.ma-story{padding:25px;gap:18px}.ma-story h1{font-size:33px}.ma-visual{display:none}.ma-header{padding-bottom:16px}}@media(max-width:480px){body.member-auth-v4{padding:12px}.ma-header{flex-wrap:wrap;gap:12px}.ma-brand img{width:38px;height:38px}.ma-brand strong{font-size:19px}.ma-header-actions{gap:6px}.ma-shop-link{padding:8px;font-size:11px}.ma-auth-panel,.ma-story{border-radius:16px}.ma-features{grid-template-columns:1fr}.ma-feature{grid-template-columns:24px 1fr;align-items:center}.ma-feature small{grid-column:2}.ma-form-top{margin-bottom:18px}}
 @media(prefers-reduced-motion:reduce){.member-auth-v4 *,.member-auth-v4 *:before,.member-auth-v4 *:after{animation:none!important;transition:none!important}}
+
+/* Keep the dark editorial panel independent from global light theme accents. */
+:root[data-theme="light"] .member-auth-v4 .ma-story{--ma-text:#fff;--ma-muted:#d3c2dc;--ma-accent:#edb4dc;--text:#fff;--muted:#d3c2dc;--mint:#edb4dc;--panel:#261c34;--soft:#30243e;--line:#594667}
+.member-auth-v4 .ma-story h1{display:block;color:#fff;overflow-wrap:normal;letter-spacing:-.045em}
+.member-auth-v4 .ma-story h1 span{display:block;color:#edb4dc}
+.member-auth-v4 .ma-story h1 span:not([class]){background:none;padding:0;border:0}
+.member-auth-v4 .ma-story>div:first-child{min-width:0}
+@media(min-width:851px) and (max-width:1100px){.member-auth-v4 .ma-story h1{font-size:clamp(30px,4vw,44px)}}
 </style></head>
-<body class="member-auth-v4">
+<body class="member-auth-v4" data-no-ui-icon>
 <header class="ma-header"><a class="ma-brand" href="{{ route('shop') }}"><img src="{{ asset('kz-brand.webp') }}" width="44" height="44" alt=""><span><strong>KazuhaDev<span class="brand-dot">.</span></strong><small>MEMBER PORTAL</small></span></a><div class="ma-header-actions"><a class="ma-shop-link" href="{{ route('shop') }}"><x-icon name="package" size="15"/> Katalog lisensi</a><x-theme-toggle/></div></header>
 <main class="ma-main">
 <section class="ma-story"><div><span class="ma-kicker"><i aria-hidden="true"></i> KAZUHADEV / MEMBER ACCESS</span><h1>Kelola lisensi.<span>Kendalikan akses.</span></h1><p>Pantau masa berlaku lisensi dan perangkat yang terhubung melalui satu portal member.</p></div>
