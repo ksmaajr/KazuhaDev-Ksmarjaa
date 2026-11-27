@@ -116,15 +116,16 @@ class PaymentSafetyTest extends TestCase
         $this->assertDatabaseCount('financial_transactions', 1);
     }
 
-    public function test_sandbox_success_cannot_issue_keys_extend_or_count_as_real_revenue(): void
+    public function test_sandbox_success_issues_isolated_demo_key_without_real_revenue(): void
     {
         $order = $this->order('sandbox');
         $keys = LicenseKey::count();
         $this->webhook($this->event($order), 'sandbox')->assertOk();
         $this->webhook($this->event($order), 'sandbox')->assertOk();
         $this->assertSame('paid', $order->fresh()->status);
-        $this->assertNull($order->fresh()->issued_license_id);
-        $this->assertDatabaseCount('license_keys', $keys);
+        $this->assertNotNull($order->fresh()->issued_license_id);
+        $this->assertDatabaseCount('license_keys', $keys + 1);
+        $this->assertSame(0, $order->fresh()->issuedLicense->games()->count());
         $this->assertDatabaseCount('financial_transactions', 0);
     }
 
