@@ -113,6 +113,11 @@ body.member-with-sidebar{font-family:'Manrope','Plus Jakarta Sans','Segoe UI Var
 .ms-footer-links a:hover{color:#fff}
 .ms-footer-v6 .status-dot{background:#9de1c5;box-shadow:0 0 0 3px #9de1c520}
 @media(max-width:650px){.member-with-sidebar .member-app-shell .member-header.ms-topbar-v6{padding:10px 12px;gap:8px;min-height:64px;flex-wrap:wrap}.ms-topbar-v6 .breadcrumbs{max-width:none!important;flex:1;gap:5px}.ms-topbar-v6 .breadcrumbs strong{font-size:12px}.ms-topbar-v6 .member-header-actions{flex-wrap:wrap;justify-content:flex-end}.member-with-sidebar .member-main .ms-footer-v6{padding:15px;gap:12px}.ms-footer-v6 .ms-footer-links{width:100%;padding-top:10px;border-top:1px solid #594763}}
+</style><style>
+/* Override the older light topbar rule with matching specificity. */
+:root[data-theme="light"] .member-with-sidebar .member-app-shell .member-header.ms-topbar-v6{background:linear-gradient(110deg,#211a2b,#30243c);border-color:#51415d;color:#f8effb}
+:root[data-theme="light"] .member-with-sidebar .ms-topbar-v6 .breadcrumbs strong{color:#fff}
+:root[data-theme="light"] .member-with-sidebar .ms-topbar-v6 .ms-topbar-label small{color:#d2b2dd}
 </style></head>
 <body class="member-body member-with-sidebar member-studio" data-sidebar-scope="member" data-feed-url="{{ route('notifications.member',absolute:false) }}">
 <x-member-sidebar :license="$license"/><div class="app-shell member-app-shell"><header class="member-header ms-topbar-v6"><button class="icon-btn sidebar-toggle" type="button" id="menu-toggle" aria-label="Buka menu" aria-controls="sidebar" aria-expanded="false"><x-icon name="menu" size="20"/></button><div class="breadcrumbs"><span class="ms-topbar-label"><small>MEMBER WORKSPACE</small><strong>Dashboard saya</strong></span></div><div class="member-header-actions"><a class="btn secondary compact" href="{{ route('member.renew') }}"><x-icon name="clock" size="15"/> Perpanjang</a><x-notification-bell/><x-theme-toggle/><form method="post" action="{{ route('member.logout') }}">@csrf<button class="btn secondary compact" type="submit"><x-icon name="logout" size="15"/> Keluar</button></form></div></header>
