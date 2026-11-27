@@ -136,6 +136,38 @@ class PaymentSafetyTest extends TestCase
         $this->assertDatabaseCount('financial_transactions', 0);
     }
 
+    public function test_sandbox_renewal_adds_duration_once_to_demo_key_without_revenue(): void
+    {
+        $purchase = $this->order('sandbox');
+        $this->webhook($this->event($purchase), 'sandbox')->assertOk();
+        $demo = $purchase->fresh()->issuedLicense;
+        $before = $demo->duration_seconds;
+        $games = $demo->games->modelKeys();
+        $product = LicenseProduct::factory()->create(['game_ids' => $games, 'duration_seconds' => 86400]);
+        $renewal = app(PurchaseService::class)->order($demo, $product->id, (string) Str::uuid(), null, true);
+        $renewal->update(['gateway_mode' => 'sandbox', 'gateway_payment_id' => 'demo-renewal', 'gateway_status' => 'pending']);
+        $keys = LicenseKey::count();
+        $this->webhook($this->event($renewal), 'sandbox')->assertOk();
+        $this->webhook($this->event($renewal), 'sandbox')->assertOk();
+        $this->assertSame($before + 86400, $demo->fresh()->duration_seconds);
+        $this->assertEqualsCanonicalizing($games, $demo->fresh()->games->modelKeys());
+        $this->assertSame($demo->id, $renewal->fresh()->issued_license_id);
+        $this->assertDatabaseCount('license_keys', $keys);
+        $this->assertDatabaseCount('financial_transactions', 0);
+    }
+
+    public function test_sandbox_renewal_cannot_extend_production_key(): void
+    {
+        [$owner] = app(LicenseService::class)->issue(['label' => 'Production owner', 'days' => 1], null, null);
+        $product = LicenseProduct::factory()->create(['game_ids' => $owner->games->modelKeys(), 'duration_seconds' => 86400]);
+        $renewal = app(PurchaseService::class)->order($owner, $product->id, (string) Str::uuid(), null, true);
+        $this->configure('sandbox');
+        $renewal->update(['gateway_mode' => 'sandbox', 'gateway_payment_id' => 'wrong-mode-renewal', 'gateway_status' => 'pending']);
+        $this->webhook($this->event($renewal), 'sandbox')->assertStatus(409);
+        $this->assertSame(86400, $owner->fresh()->duration_seconds);
+        $this->assertSame('pending', $renewal->fresh()->status);
+    }
+
     public function test_invoice_creation_is_once_and_uses_server_price_and_method(): void
     {
         $this->configure();
