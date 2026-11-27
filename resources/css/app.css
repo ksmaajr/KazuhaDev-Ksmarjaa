@@ -617,3 +617,11 @@ body{font-size:15px}.page-heading p,.panel-heading p{line-height:1.85}.btn{min-h
 @media(max-width:950px){.pk-hero{grid-template-columns:1fr;gap:15px}.pk-hero{padding:18px}}
 @media(max-width:420px){.pk-overview>div{padding:8px}.pk-overview small{font-size:10px}.pk-overview strong{font-size:20px}.pk-filter .list-filters{padding:12px}.package-studio .catalog-package-footer{align-items:stretch}}
 @media(prefers-reduced-motion:reduce){.package-studio *{animation:none!important;transition:none!important}.package-studio .catalog-package:hover{transform:none}}
+
+.pk-editor .lk-form-section>label{display:block;margin:12px 0 6px}
+.pk-editor .lk-form-section>input,.pk-editor .lk-form-section>textarea,.pk-editor .rupiah-field{width:100%}
+.pk-editor .lk-form-section>textarea{resize:vertical;min-height:70px}
+.pk-editor .lk-section-title>span{background:var(--mint-bg)}
+.pk-editor .pk-editor-review{margin:16px 0 20px;padding:14px;border:1px solid var(--line);border-radius:12px;background:linear-gradient(120deg,var(--soft),var(--panel))}
+.pk-review-heading{display:flex;align-items:center;gap:10px}.pk-review-heading small,.pk-review-heading strong{display:block;overflow-wrap:anywhere}.pk-review-heading small{font-size:10px;color:var(--mint);letter-spacing:1px}.pk-review-heading strong{font-size:15px;margin-top:4px}
+.pk-editor-review .lk-review{background:var(--panel);margin:12px 0 8px}.pk-editor-review .field-help{margin:0}

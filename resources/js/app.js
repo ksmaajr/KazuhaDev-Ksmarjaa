@@ -319,3 +319,24 @@ function initializePackageBrowsers() {
 window.addEventListener('resize', () => document.querySelectorAll('[data-lk-browser]').forEach(refreshPackageArrows));
 document.addEventListener('live:updated', initializePackageBrowsers);
 initializePackageBrowsers();
+
+// Product editor summary reuses native and formatted currency inputs.
+function refreshProductPreview(form) {
+    const read = name => form.querySelector('[name="'+name+'"]')?.value || '';
+    form.querySelector('[data-pk-name]').textContent = read('name').trim() || 'Paket baru';
+    form.querySelector('[data-pk-price]').textContent = read('price') ? 'Rp '+Number(read('price')).toLocaleString('id-ID') : '—';
+    const hours = Number(read('hours') || 0), minutes = Number(read('minutes') || 0);
+    form.querySelector('[data-pk-duration]').textContent = hours+' jam '+minutes+' menit';
+    form.querySelector('[data-pk-games]').textContent = form.querySelectorAll('[name="game_ids[]"]:checked').length+' game';
+}
+for (const eventName of ['input','change','click']) {
+    document.addEventListener(eventName, event => {
+        const form = event.target.closest('[data-pk-editor]');
+        if (form) refreshProductPreview(form);
+        if (eventName === 'click') {
+            const opener = event.target.closest('[data-open-dialog]');
+            const editor = opener && document.getElementById(opener.dataset.openDialog)?.querySelector('[data-pk-editor]');
+            if (editor) refreshProductPreview(editor);
+        }
+    });
+}
