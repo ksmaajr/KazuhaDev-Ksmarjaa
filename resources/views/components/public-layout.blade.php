@@ -31,4 +31,19 @@
 :root[data-theme="light"] .storefront-body .checkout-studio .invoice-total-card>span,:root[data-theme="light"] .storefront-body .checkout-studio .invoice-total-card>div{color:#ddd1e3}
 :root[data-theme="light"] .storefront-body input:not([type=checkbox]):not([type=radio]),:root[data-theme="light"] .storefront-body select{background:#fff;color:#201d24;border-color:#c9c3cf}
 :root[data-theme="light"] .storefront-body .btn.primary{background:linear-gradient(110deg,#a62e76,#7145b4);color:#fff}
+
+/* Public typography: clean geometric headings and legible interface text. */
+.storefront-body{--font-sans:'Manrope','Plus Jakarta Sans','Segoe UI Variable','Segoe UI',system-ui,sans-serif;font-family:var(--font-sans);font-size:14px;line-height:1.65;font-optical-sizing:auto;text-rendering:optimizeLegibility}
+.storefront-body h1,.storefront-body h2,.storefront-body h3,.storefront-body .brand{font-family:var(--font-sans)}
+.storefront-body button,.storefront-body input,.storefront-body select,.storefront-body textarea{font-family:inherit}
+.storefront-body .store-brand-copy strong{font-weight:750;letter-spacing:-.045em}
+.storefront-body .store-redesign .storefront-intro h1{font-weight:750;letter-spacing:-.045em}
+.storefront-body .store-redesign .store-premium-card h2{font-weight:700;letter-spacing:-.025em}
+.storefront-body .store-redesign .store-price-panel .product-price,.storefront-body .checkout-studio .invoice-total-card>strong{font-weight:750;font-variant-numeric:tabular-nums lining-nums;letter-spacing:-.04em}
+.storefront-body .store-redesign .game-card-description,.storefront-body .storefront-intro p{font-size:14px;line-height:1.65}
+.storefront-body .store-product-type,.storefront-body .store-access-block>span,.storefront-body .eyebrow{letter-spacing:.09em;font-weight:600}
+.storefront-body .store-card-note{font-size:11px;line-height:1.5}
+.storefront-body .btn{font-weight:650;letter-spacing:.005em}
+.storefront-body .invoice-facts dd{font-variant-numeric:tabular-nums}
+.storefront-body .receipt-reference strong,.storefront-body .paid-key code{font-family:'Cascadia Mono','Consolas',ui-monospace,monospace}
 </style></head><body class="member-body storefront-body"><header class="member-header store-header-v2"><a class="brand" href="{{ route('home') }}"><img class="brand-mark admin-brand-mark kz-brand-image" src="{{ asset('kz-brand.webp') }}" width="44" height="44" alt=""><span class="store-brand-copy"><strong>KazuhaDev<span class="brand-dot">.</span></strong><small>LICENSE STORE</small></span></a><nav class="store-header-nav" aria-label="Navigasi toko"><a href="{{ route('shop') }}" @if(request()->routeIs('home','shop')) aria-current="page" @endif><x-icon name="package" size="16"/> Katalog lisensi</a></nav><div class="member-header-actions"><a class="btn primary compact store-member-cta" href="{{ $license ? route('member.dashboard') : route('member.login') }}"><x-icon name="user" size="16"/> {{ $license?'Dashboard member':'Masuk member' }} <x-icon name="arrow" size="14"/></a><x-theme-toggle/></div></header><main class="storefront-main"><x-flash-messages/><div data-live-content>{{ $slot }}</div><footer class="footer"><span>© {{ now()->year }} KazuhaDev.</span><span>Lisensi perangkat · Masa berlaku sejak aktivasi</span></footer></main><x-feedback/></body></html>
