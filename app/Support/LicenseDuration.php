@@ -29,7 +29,14 @@ class LicenseDuration
 
     public static function label(int $seconds): string
     {
-        return intdiv($seconds, 3600).' jam '.intdiv($seconds % 3600, 60).' menit';
+        $hours = intdiv($seconds, 3600);
+        $minutes = intdiv($seconds % 3600, 60);
+
+        if ($minutes === 0) {
+            return $hours.' jam';
+        }
+
+        return $hours > 0 ? $hours.' jam '.$minutes.' menit' : $minutes.' menit';
     }
 
     public static function productData(array $data): array
