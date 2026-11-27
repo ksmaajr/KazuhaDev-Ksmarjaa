@@ -483,3 +483,32 @@ body{font-size:15px}.page-heading p,.panel-heading p{line-height:1.85}.btn{min-h
 @keyframes lk-package-reveal{from{opacity:0;translate:0 -5px}to{opacity:1;translate:0 0}}
 @media(max-width:480px){.lk-package-card{flex-basis:155px}.lk-package-disclosure{font-size:10px}.lk-package-current{font-size:10px}}
 @media(prefers-reduced-motion:reduce){.lk-package-body,.lk-package-card,.lk-package-disclosure svg{animation:none!important;transition:none!important}}
+
+/* License record workspace: grouped information, honest data and compact chrome. */
+.detail-modal.license-insight{width:min(880px,calc(100vw - 28px));font-family:'Manrope','Plus Jakarta Sans',system-ui,sans-serif;border-radius:16px}
+.license-insight>.modal-heading{padding:18px 24px}
+.license-insight .detail-content{padding:18px 24px}
+.license-insight .detail-intro{padding:14px 16px;border:1px solid var(--line);border-radius:10px;background:linear-gradient(115deg,var(--soft),var(--panel));margin-bottom:12px;align-items:center}
+.license-insight .detail-subtitle{font-size:19px;font-weight:700;overflow-wrap:anywhere}
+.license-insight .detail-facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:0 0 16px}
+.license-insight .detail-facts>div{padding:12px;min-width:0;border-radius:10px;background:var(--panel);border:1px solid var(--line);box-shadow:inset 0 2px color-mix(in srgb,var(--mint) 35%,transparent)}
+.license-insight .detail-facts strong{font-size:14px;line-height:1.45;overflow-wrap:anywhere;white-space:normal}
+.license-insight .detail-facts span{font-size:10.5px;color:var(--muted)}
+.license-insight .detail-tabs{position:sticky;top:0;z-index:1;background:var(--panel);padding:6px 0}
+.license-insight .detail-group{margin:16px 0}
+.license-insight .detail-group-heading{font-size:11px;letter-spacing:1px;color:var(--mint);margin-bottom:8px}
+.license-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:0}
+.license-detail-field{padding:12px 14px;background:var(--panel);min-width:0;transition:background .18s}
+.license-detail-field:hover{background:var(--soft)}
+.license-detail-field.wide{grid-column:1/-1}
+.license-detail-field dt{font-size:11px;color:var(--muted);margin:0 0 6px}
+.license-detail-field dd{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:0;font-size:13px;font-weight:600;overflow-wrap:anywhere;min-width:0}
+.license-detail-field dd>span,.license-detail-field dd>code{max-width:100%;white-space:pre-wrap;overflow-wrap:anywhere}
+.license-insight .detail-tab-panel:not([hidden]){animation:license-insight-enter .24s ease both}
+.license-insight .record-timeline li{padding:12px 14px;margin:0 0 9px;background:var(--soft);border:1px solid var(--line);border-radius:8px}
+.license-insight .record-timeline li:before{top:17px}
+.license-insight .detail-footer{padding:12px 24px}
+@keyframes license-insight-enter{from{opacity:0;translate:0 5px}to{opacity:1;translate:0 0}}
+@media(max-width:640px){.license-insight .detail-facts{grid-template-columns:repeat(2,minmax(0,1fr))}.license-insight>.modal-heading,.license-insight .detail-content,.license-insight .detail-footer{padding:14px}.license-detail-field{padding:10px}.license-insight .detail-facts strong{font-size:13px}}
+@media(max-width:360px){.license-detail-grid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.license-insight *{animation:none!important;transition:none!important}}
