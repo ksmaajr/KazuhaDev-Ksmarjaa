@@ -35,7 +35,7 @@ class MemberPortalTest extends TestCase
         }
         $this->get('/member/login')->assertRedirect('/member');
         $this->get('/member')->assertOk();
-        $this->post('/member/logout')->assertRedirect('/member/login');
+        $this->post('/member/logout')->assertStatus(303)->assertRedirect('/member/login')->assertSessionMissing('member_license_id');
         $this->get('/shop')->assertOk()->assertSee('Masuk member');
         $this->get('/member/login')->assertOk();
     }
@@ -132,9 +132,21 @@ class MemberPortalTest extends TestCase
     {
         [$license,$key] = $this->issue();
         $this->post('/member/login', ['key' => $key]);
-        $this->post('/member/logout')->assertRedirect('/member/login');
+        $this->post('/member/logout')->assertStatus(303)->assertRedirect('/member/login')->assertSessionMissing('member_license_id');
         $this->get('/member')->assertRedirect('/member/login');
+        $this->getJson('/member/status')->assertUnauthorized();
+        $this->get('/shop')->assertOk()->assertSee('Masuk member');
+        $this->get('/member/login')->assertOk();
         $this->post('/member/reset-hwid')->assertRedirect('/member/login');
+    }
+
+    public function test_logout_clears_checkout_credentials_and_keeps_admin_session(): void
+    {
+        [$license] = $this->issue();
+        $admin = \App\Models\User::factory()->create();
+        $this->actingAs($admin)->withSession(['member_license_id' => $license->id, 'checkout_secret' => 'guest-secret', 'payment_return_order' => 'KZ-TEST']);
+        $this->post('/member/logout')->assertStatus(303)->assertSessionMissing('member_license_id')->assertSessionMissing('checkout_secret')->assertSessionMissing('payment_return_order');
+        $this->assertAuthenticatedAs($admin);
     }
 
     public function test_member_live_status_is_scoped_and_does_not_reveal_license_secret(): void
