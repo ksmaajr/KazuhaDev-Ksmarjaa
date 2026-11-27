@@ -634,3 +634,31 @@ body{font-size:15px}.page-heading p,.panel-heading p{line-height:1.85}.btn{min-h
 .package-insight .detail-fact-card[data-insight-tone="money"] strong{font-size:19px;letter-spacing:-.04em}
 .package-insight .detail-fact-card[data-insight-tone="device"] strong{font-size:12px}
 .package-insight .license-detail-field.wide{padding-block:15px}
+
+/* Package cards V2.1: consistent proportions and a single aligned action rail. */
+.package-studio .catalog-package-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,350px),1fr));gap:16px;align-items:stretch}
+.package-studio .catalog-package-grid>.catalog-package{width:100%;max-width:460px;justify-self:start;container-type:inline-size}
+.package-studio .catalog-package-grid>.catalog-package:only-child{grid-column:auto;width:100%;max-width:420px}
+.package-studio .catalog-package-art{height:132px;flex-shrink:0}
+.package-studio .catalog-package-art:after{background:linear-gradient(0deg,var(--panel),transparent 68%)}
+.package-studio .catalog-package-body{display:flex;flex-direction:column;padding:16px 18px;gap:0}
+.package-studio .catalog-package-topline{margin:0 0 12px;align-items:center}
+.package-studio .catalog-package h3 .record-link{font-size:20px;line-height:1.35}
+.package-studio .catalog-package .catalog-description{margin:7px 0 0;font-size:12px;line-height:1.65;min-height:40px}
+.package-studio .catalog-package-facts{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin:14px 0 0;padding:12px;background:var(--soft);border:1px solid var(--line);border-radius:9px}
+.package-studio .catalog-package-facts>div{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.package-studio .catalog-package-facts>div+div{border-left:1px solid var(--line);padding-left:12px}
+.package-studio .catalog-package-facts>div>span{font-size:10px;white-space:normal;line-height:1.4}
+.package-studio .catalog-price{display:block;font-size:24px;line-height:1.2;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.package-studio .catalog-price small{font-size:12px}
+.package-studio .catalog-duration{display:block;font-size:14px;line-height:1.4;margin:2px 0 0}
+.package-studio .catalog-package-facts>div>small{margin:0;font-size:10px;line-height:1.4}
+.package-studio .catalog-package-games{padding-top:13px;margin-top:auto}
+.package-studio .catalog-game-list{margin-top:7px;display:flex;flex-wrap:wrap;gap:5px}
+.package-studio .catalog-package-footer{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.45fr);gap:6px;padding:12px 14px;align-items:stretch;justify-content:initial}
+.package-studio .catalog-package-actions{display:contents}
+.package-studio .catalog-package-actions form{display:flex;min-width:0;margin:0}
+.package-studio .catalog-package-footer .btn{display:flex;align-items:center;justify-content:center;gap:5px;width:100%;min-width:0;min-height:36px;padding:7px 5px;font-size:11px;white-space:normal;text-align:center;line-height:1.3}
+.package-studio .catalog-package-footer .btn svg{flex-shrink:0}
+@container (max-width:340px){.package-studio .catalog-package-footer{padding:10px;gap:4px}.package-studio .catalog-package-footer .btn{font-size:10px;padding-inline:3px}.package-studio .catalog-package-footer .btn svg{width:12px;height:12px}.package-studio .catalog-package-body{padding:14px}.package-studio .catalog-price{font-size:21px}}
+@container (max-width:265px){.package-studio .catalog-package-footer{grid-template-columns:1fr 1fr}.package-studio .catalog-package-actions form{grid-column:1/-1}.package-studio .catalog-package-facts{grid-template-columns:1fr}.package-studio .catalog-package-facts>div+div{padding:9px 0 0;border-left:0;border-top:1px solid var(--line)}}
