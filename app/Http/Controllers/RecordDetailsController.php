@@ -145,6 +145,9 @@ class RecordDetailsController extends Controller
                         ->where(fn ($query) => $query->whereNull('gateway_mode')->orWhere('gateway_mode', 'production'))
                         ->latest('id')->first();
                     $add('Paket penerbitan', $purchase?->product_name ?? ($snapshot['name'] ?? (($created?->metadata['issuance_source'] ?? null) === 'manual' ? 'Custom / tanpa paket' : 'Tidak tercatat')));
+                    if (($packageId = $purchase?->product_id ?? ($snapshot['id'] ?? null)) && LicenseProduct::whereKey($packageId)->exists()) {
+                        $link('Lihat paket di katalog', 'product', (int) $packageId);
+                    }
                     $add('Sumber penerbitan', $purchase ? 'Pembelian terverifikasi' : ($created?->user_id ? 'Administrator' : 'Tidak tercatat'));
                     $ledger = FinancialTransaction::where('reference', 'LIC-MAN-'.$record->id)->first();
                     if ($ledger) {
@@ -178,8 +181,36 @@ class RecordDetailsController extends Controller
                 foreach (['Referensi' => $record->reference, 'Deskripsi' => $record->description, 'Jenis' => $record->direction, 'Sumber' => $record->source, 'Status' => $record->status, 'Bruto' => 'Rp '.number_format($record->amount, 0, ',', '.'), 'Biaya' => 'Rp '.number_format($record->fee, 0, ',', '.'), 'Neto' => 'Rp '.number_format($record->amount - $record->fee, 0, ',', '.'), 'Referensi pembayaran' => $record->external_reference, 'Waktu bayar' => $date($record->paid_at), 'Dicatat' => $date($record->created_at), 'Dicatat oleh' => $record->created_by ? User::find($record->created_by)?->name : 'Webhook gateway'] as $label => $value) {
                     $add($label, $value);
                 }
-                if ($record->order_id) {
-                    $link('Lihat detail pesanan', 'order', $record->order_id);
+                $order = $record->order_id ? PurchaseOrder::find($record->order_id) : null;
+                $license = null;
+                $packageId = null;
+                if ($order) {
+                    $link('Lihat detail pesanan', 'order', $order->id);
+                    $license = LicenseKey::withTrashed()->find($order->purpose === 'renewal' ? $order->owner_license_id : $order->issued_license_id);
+                    $packageId = $order->product_id;
+                    $add('Paket saat transaksi', $order->product_name);
+                    $add('Durasi paket', LicenseDuration::label($order->duration_seconds ?? $order->days * 86400));
+                    $add('Akses game paket', collect($order->game_snapshot ?? [])->pluck('name')->join(', ') ?: Game::whereIn('id', $order->game_ids ?? [])->pluck('name')->join(', '));
+                } elseif ($record->source === 'manual' && preg_match('/^LIC-MAN-([0-9]+)$/D', $record->reference, $matches)) {
+                    $issuance = LicenseEvent::where('license_key_id', (int) $matches[1])->where('action', 'created')->where('metadata->reference', $record->reference)->first();
+                    if ($issuance) {
+                        $license = LicenseKey::withTrashed()->find($issuance->license_key_id);
+                        $snapshot = $issuance->metadata['issued_package'] ?? [];
+                        $packageId = $snapshot['id'] ?? null;
+                        $add('Paket saat transaksi', $snapshot['name'] ?? null);
+                        $add('Durasi paket', isset($snapshot['duration_seconds']) ? LicenseDuration::label($snapshot['duration_seconds']) : null);
+                        $add('Akses game paket', Game::whereIn('id', $snapshot['game_ids'] ?? [])->pluck('name')->join(', '));
+                    }
+                }
+                if ($license) {
+                    $add('ID lisensi terkait', '#'.$license->id);
+                    $add('Label lisensi', $license->label);
+                    $add('Member lisensi', $license->member_name);
+                    $add('Key terkait', $license->key_hint);
+                    $link('Lihat detail lisensi', 'license', $license->id);
+                }
+                if ($packageId && LicenseProduct::whereKey($packageId)->exists()) {
+                    $link('Lihat paket di katalog', 'product', (int) $packageId);
                 }
                 $events = LicenseEvent::where('metadata->reference', $record->reference);
                 break;

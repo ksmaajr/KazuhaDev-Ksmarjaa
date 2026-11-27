@@ -692,3 +692,17 @@ body{font-size:15px}.page-heading p,.panel-heading p{line-height:1.85}.btn{min-h
 .fin-editor .lk-form-section>label{display:block;margin:12px 0 6px}.fin-editor .lk-form-section>input,.fin-editor .rupiah-field{width:100%}.fin-editor .lk-modal-content>.hint-box{margin:12px 0 18px}
 .fin-editor-preview{display:flex;gap:12px;align-items:center;padding:15px;background:linear-gradient(120deg,var(--soft),var(--panel));border:1px solid var(--line);border-radius:10px;margin-top:15px}.fin-editor-preview small,.fin-editor-preview strong{display:block}.fin-editor-preview small{font-size:11px;color:var(--muted)}.fin-editor-preview strong{font-size:23px;letter-spacing:-.04em;margin-top:4px;overflow-wrap:anywhere}
 .finance-insight .detail-facts{grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr))}.finance-insight .detail-fact-card strong{font-size:18px}
+
+/* Finance insight: stable cards and related-record navigation. */
+.finance-insight .license-detail-grid{display:grid;gap:8px;background:transparent;border:0;overflow:visible}
+.finance-insight .license-detail-field{border:1px solid var(--line);border-radius:9px;padding:12px 14px;background:var(--panel)}
+.finance-insight .detail-related{padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--soft);margin:12px 0 18px}
+.finance-insight .detail-links{display:flex;flex-wrap:wrap;gap:8px}
+.finance-insight .detail-links .btn{display:inline-flex;align-items:center;gap:7px;min-height:36px;white-space:normal;text-align:left}
+.finance-insight .detail-links svg{width:16px;height:16px;color:var(--mint);flex:none}
+.finance-insight .detail-tabs{position:static;margin-bottom:12px}
+.finance-insight .detail-facts{grid-template-columns:repeat(4,minmax(0,1fr))}
+.finance-insight .detail-fact-card[data-insight-tone=money]>.insight-symbol{color:#8fcab0}
+.finance-insight .detail-fact-card[data-insight-tone=note]>.insight-symbol{color:#d5ad74}
+.finance-insight .detail-fact-card[data-insight-tone=activity]>.insight-symbol{color:#82b9d6}
+@media(max-width:640px){.finance-insight .detail-facts{grid-template-columns:repeat(2,minmax(0,1fr))}.finance-insight .license-detail-grid{grid-template-columns:minmax(0,1fr)}}
