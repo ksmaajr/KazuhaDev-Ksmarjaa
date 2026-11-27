@@ -765,3 +765,16 @@ body{font-size:15px}.page-heading p,.panel-heading p{line-height:1.85}.btn{min-h
 .gm-meta{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}.gm-meta>span{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:6px;padding:5px 7px;color:var(--muted);font-size:11px;overflow-wrap:anywhere}.gm-meta svg{color:var(--mint);flex:none}
 @media(max-width:600px){.gm-hero{padding:15px;gap:10px}.gm-count{border:0;padding:0}.gm-catalog .game-card{max-width:none}}
 @media(prefers-reduced-motion:reduce){.gm-catalog *{animation:none!important;transition:none!important}}
+
+/* Presentation of catalog identity fields only; release controls retain existing behavior. */
+.gm-identity-modal .gm-identity-heading{display:flex;align-items:center;gap:12px}
+.gm-identity-heading>div{flex:1;min-width:0}
+.gm-identity-heading h2{font-size:21px;letter-spacing:-.035em;margin:4px 0}
+.gm-identity-heading p{font-size:12px;color:var(--muted);margin:0}
+.gm-identity-section{padding:14px;border:1px solid var(--line);border-radius:10px;background:var(--panel);margin:12px 0}
+.gm-identity-section h3{display:flex;align-items:center;gap:7px;font-size:14px;margin:0 0 12px}
+.gm-identity-section h3 svg{color:var(--mint)}
+.gm-identity-section label{display:block;margin:10px 0 6px}
+.gm-identity-section input{width:100%}
+.gm-identity-section .field-help{margin-bottom:0}
+@media(max-width:480px){.gm-identity-heading .gm-symbol{width:37px;height:37px}.gm-identity-heading h2{font-size:18px}.gm-identity-section{padding:10px}}
