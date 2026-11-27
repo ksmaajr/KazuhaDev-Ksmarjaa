@@ -2,7 +2,7 @@
 <div class="store-redesign"><section class="storefront-intro"><div><span class="eyebrow">{{ $renewal?'RENEW YOUR ACCESS':'KAZUHADEV / LICENSE STORE' }}</span><h1>{{ $renewal?'Waktu baru. Key yang sama.':'Temukan lisensi Anda.' }}</h1><p>{{ $renewal?'Pilih durasi untuk key Anda. Perpanjangan menjaga HWID, akses game, dan aktivasi pertama.':'Pilih paket yang sesuai dengan kebutuhan Anda. Satu alur pembelian, dari pemilihan lisensi hingga aktivasi.' }}</p></div><div class="storefront-assurance"><x-icon name="shield" size="25"/><span>{{ $renewal?$license->key_hint:'Akses satu perangkat' }}<small>{{ $renewal?$license->member_name:'Durasi dimulai sejak aktivasi pertama' }}</small></span></div></section>
 @if($gatewayMode==='sandbox')<div class="hint-box"><x-icon name="code" size="17"/><span>Lingkungan demo: pembelian sandbox menerbitkan key demo untuk portal member, tanpa akses produksi atau pendapatan riil.</span></div>@endif
 @if(($pendingInvoices ?? collect())->isNotEmpty())
-<section class="store-pending-invoices" aria-label="Invoice belum selesai"><div class="store-pending-heading"><x-icon name="receipt" size="22"/><div><strong>Anda memiliki invoice yang belum selesai</strong><p>Lanjutkan invoice yang tersedia tanpa membuat pembayaran baru.</p></div></div>
+<section class="store-pending-invoices {{ $pendingInvoices->contains(fn($invoice) => !in_array($invoice->gateway_status, ['failed','expired'])) ? 'store-pending-live' : '' }}" aria-label="Invoice belum selesai"><div class="store-pending-heading"><span class="store-pending-symbol"><x-icon name="receipt" size="22"/></span><div><strong>Anda memiliki invoice yang belum selesai</strong><p>Lanjutkan invoice yang tersedia tanpa membuat pembayaran baru.</p></div></div>
 @foreach($pendingInvoices as $pending)<a class="store-pending-row" href="{{ route('checkout.receipt', ['order' => $pending->number]) }}"><div><strong>{{ $pending->product_name }}</strong><small>{{ $pending->number }} · {{ $pending->created_at->timezone('Asia/Jakarta')->format('d M Y, H:i') }} WIB</small></div><div class="store-pending-price"><strong>Rp {{ number_format($pending->amount,0,',','.') }}</strong><small class="store-wait-status {{ in_array($pending->gateway_status,['failed','expired'])?'needs-review':'is-waiting' }}"><i aria-hidden="true"></i>{{ in_array($pending->gateway_status,['creating','uncertain'])?'Menunggu konfirmasi':(in_array($pending->gateway_status,['failed','expired'])?'Perlu pemeriksaan':'Belum selesai') }}</small></div><x-icon name="arrow" size="16"/></a>@endforeach
 </section>@endif
 <div class="checkout-steps" aria-label="Tahapan pembelian"><span class="current"><b>01</b> {{ $renewal?'Pilih perpanjangan':'Pilih paket' }}</span><i></i><span><b>02</b> Metode pembayaran</span><i></i><span><b>03</b> {{ $renewal?'Key diperpanjang':'Key siap digunakan' }}</span></div>
@@ -115,5 +115,22 @@
 @keyframes kz-wait-ring{0%{transform:scale(.85);opacity:.65}80%,100%{transform:scale(1.7);opacity:0}}
 @keyframes kz-wait-breathe{0%,100%{opacity:.75}50%{opacity:1}}
 @media(prefers-reduced-motion:reduce){.store-wait-status i:after,.store-wait-clock:after,.store-wait-clock svg{animation:none!important}}
+
+/* Premium pending invoice: traveling highlight, soft halo, and animated status. */
+.store-redesign .store-pending-invoices{position:relative;isolation:isolate;overflow:hidden;border-color:color-mix(in srgb,var(--mint) 55%,var(--line));background:linear-gradient(115deg,color-mix(in srgb,var(--mint) 7%,var(--panel)),var(--panel) 55%);box-shadow:0 8px 24px #00000012}
+.store-redesign .store-pending-live:before{content:"";position:absolute;inset:0;pointer-events:none;z-index:-1;background:linear-gradient(110deg,transparent 25%,color-mix(in srgb,var(--mint) 13%,transparent) 48%,transparent 70%);transform:translateX(-110%);animation:kz-invoice-sweep 5.5s ease-in-out 3}
+.store-redesign .store-pending-live{animation:kz-invoice-halo 3s ease-in-out 5}
+.store-pending-symbol{width:44px;height:44px;display:grid;place-items:center;flex:none;border-radius:12px;border:1px solid color-mix(in srgb,var(--mint) 40%,var(--line));background:var(--mint-bg);color:var(--mint);position:relative}
+.store-pending-live .store-pending-symbol:after{content:"";position:absolute;inset:-3px;border:1px solid var(--mint);border-radius:15px;pointer-events:none;animation:kz-invoice-symbol 2.8s ease-out 5}
+.store-redesign .store-pending-row{position:relative;overflow:hidden;transition:transform .2s,border-color .2s,background .2s}
+.store-redesign .store-pending-row:hover{transform:translateY(-2px);border-color:var(--mint);background:color-mix(in srgb,var(--mint) 6%,var(--soft))}
+.store-redesign .store-pending-row:hover>svg:last-child{transform:translateX(3px)}
+.store-pending-row>svg:last-child{transition:transform .2s;color:var(--mint)}
+.store-redesign .store-pending-row .store-wait-status{font-weight:600;color:var(--mint)}
+.store-redesign .store-pending-row .store-wait-status.needs-review{color:var(--muted)}
+@keyframes kz-invoice-sweep{0%{transform:translateX(-110%)}45%,100%{transform:translateX(110%)}}
+@keyframes kz-invoice-halo{0%,100%{box-shadow:0 8px 24px #00000012}50%{box-shadow:0 0 22px color-mix(in srgb,var(--mint) 16%,transparent),0 8px 24px #00000012}}
+@keyframes kz-invoice-symbol{0%{transform:scale(.94);opacity:.45}75%,100%{transform:scale(1.25);opacity:0}}
+@media(prefers-reduced-motion:reduce){.store-redesign .store-pending-live,.store-redesign .store-pending-live:before,.store-pending-live .store-pending-symbol:after{animation:none!important}.store-redesign .store-pending-row,.store-pending-row>svg:last-child{transition:none}.store-redesign .store-pending-row:hover,.store-redesign .store-pending-row:hover>svg:last-child{transform:none}}
 </style>
 </x-dynamic-component>
