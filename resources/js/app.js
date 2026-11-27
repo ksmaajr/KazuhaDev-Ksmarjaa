@@ -218,3 +218,52 @@ document.addEventListener('click', event => {
         }
     });
 });
+
+// Package presets are authoritative on the server; the form previews the same values.
+function syncLicensePreview(form) {
+    const hours = form.querySelector('[name="hours"]');
+    const minutes = form.querySelector('[name="minutes"]');
+    const count = form.querySelectorAll('[name="game_ids[]"]:checked').length;
+    form.querySelector('[data-lk-summary-duration]').textContent = Number(hours.value || 0) + ' jam ' + Number(minutes.value || 0) + ' menit';
+    form.querySelector('[data-lk-summary-games]').textContent = count + ' game';
+}
+function applyLicensePackage(form) {
+    const select = form.querySelector('[data-license-product]');
+    const option = select.selectedOptions[0];
+    const fields = form.querySelector('[data-lk-package-fields]');
+    const chosen = Boolean(select.value);
+    const hours = form.querySelector('[name="hours"]');
+    const minutes = form.querySelector('[name="minutes"]');
+    if (chosen) {
+        const seconds = Number(option.dataset.duration);
+        const ids = (option.dataset.games || '').split(',');
+        hours.value = Math.floor(seconds / 3600);
+        minutes.value = Math.floor(seconds % 3600 / 60);
+        form.querySelectorAll('[name="game_ids[]"]').forEach(input => { input.checked = ids.includes(input.value); });
+        hours.dispatchEvent(new Event('input', {bubbles: true}));
+    }
+    fields.classList.toggle('is-package', chosen);
+    fields.querySelectorAll('input,button').forEach(input => { input.disabled = chosen; });
+    form.querySelector('[data-lk-package-hint]').textContent = chosen ? 'Durasi dan akses game mengikuti paket terpilih. Pilih Custom untuk mengubahnya.' : 'Atur durasi dan akses game secara manual. Tidak membuat invoice.';
+    syncLicensePreview(form);
+}
+function initializeLicenseCreation() {
+    document.querySelectorAll('[data-lk-create]').forEach(applyLicensePackage);
+}
+document.addEventListener('change', event => {
+    const form = event.target.closest('[data-lk-create]');
+    if (!form) return;
+    if (event.target.matches('[data-license-product]')) applyLicensePackage(form);
+    else syncLicensePreview(form);
+});
+document.addEventListener('input', event => {
+    const form = event.target.closest('[data-lk-create]');
+    if (form) syncLicensePreview(form);
+});
+document.addEventListener('click', event => {
+    const preset = event.target.closest('[data-duration-hours]');
+    const form = preset?.closest('[data-lk-create]');
+    if (form) syncLicensePreview(form);
+});
+document.addEventListener('live:updated', initializeLicenseCreation);
+initializeLicenseCreation();

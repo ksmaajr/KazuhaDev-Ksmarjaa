@@ -17,12 +17,14 @@
     </header>
     <div class="ov-section-heading"><div><div class="ov-kicker">01 / ACCESS MANAGEMENT</div><h2>Status lisensi</h2></div><a class="text-link" href="{{ route('licenses') }}">Semua lisensi <x-icon name="arrow" size="14"/></a></div>
 @else
-<div class="page-heading"><div><div class="eyebrow">WORKSPACE / LICENSE MANAGEMENT</div><h1>License keys</h1><p>Kelola lisensi, pantau perangkat, dan amankan akses aplikasi Anda.</p></div><button class="btn primary" data-open-dialog="create-key"><x-icon name="plus" size="18"/> Buat key baru</button></div>
+<div class="license-studio overview-studio" data-no-ui-icon>
+<header class="ov-hero lk-hero"><div class="ov-hero-copy"><div class="ov-kicker"><span></span> WORKSPACE / LICENSE MANAGEMENT</div><h1>License keys<span>.</span></h1><p>Kelola akses member, masa berlaku, dan perangkat dalam satu workspace.</p><div class="ov-actions"><button type="button" class="btn primary" data-open-dialog="create-key"><x-icon name="plus" size="17"/> Buat key baru</button><a class="btn secondary" href="{{ route('activity') }}">Riwayat aktivitas <x-icon name="arrow" size="15"/></a></div></div><div class="ov-hero-side"><span class="ov-muted">Total lisensi diterbitkan</span><strong class="ov-revenue">{{ number_format($counts['total']) }}</strong><span class="ov-muted">{{ number_format($counts['unbound']) }} menunggu aktivasi perangkat</span></div></header>
+<div class="ov-section-heading"><div><div class="ov-kicker">01 / LICENSE STATUS</div><h2>Ringkasan akses</h2></div></div>
 @endif
 @if(session('issued_key'))<div class="issued-key"><div><span class="eyebrow">KEY BARU · SALIN SEKARANG</span><code id="issued-key">{{ session('issued_key') }}</code><small>Key tersimpan terenkripsi dan dapat disalin kembali melalui daftar lisensi.</small></div><button class="btn secondary" data-copy="{{ session('issued_key') }}"><x-icon name="copy" size="17"/> Salin key</button></div>@endif
 <div class="stats-grid">
 @foreach([['total','Total license keys','key','Semua key yang diterbitkan'],['active','Key aktif','shield','Terikat ke perangkat'],['unbound','Menunggu aktivasi','device','Siap untuk perangkat baru'],['expired','Kedaluwarsa','clock','Masa berlaku telah habis']] as [$name,$label,$icon,$description])
-<a class="stat-card" href="{{ route('licenses',$name==='total'?[]:['status'=>$name]) }}"><div class="stat-top"><span>{{ $label }}</span><span class="stat-icon {{ $name }}"><x-icon :name="$icon" size="18"/></span></div><strong class="stat-number">{{ number_format($counts[$name]) }}@unless($isLicenses)<span class="ov-stat-share">{{ $counts['total'] ? number_format($counts[$name]/$counts['total']*100,0,',','.') : 0 }}%</span>@endunless</strong><div class="stat-bottom"><span class="tiny-dot {{ $name }}"></span>{{ $description }}</div>@unless($isLicenses)<progress class="ov-meter" max="{{ max(1,$counts['total']) }}" value="{{ $counts[$name] }}" aria-label="{{ $label }}: {{ $counts[$name] }} dari {{ $counts['total'] }}"></progress>@endunless</a>
+<a class="stat-card" href="{{ route('licenses',$name==='total'?[]:['status'=>$name]) }}"><div class="stat-top"><span>{{ $label }}</span><span class="stat-icon {{ $name }}"><x-icon :name="$icon" size="18"/></span></div><strong class="stat-number">{{ number_format($counts[$name]) }}<span class="ov-stat-share">{{ $counts['total'] ? number_format($counts[$name]/$counts['total']*100,0,',','.') : 0 }}%</span></strong><div class="stat-bottom"><span class="tiny-dot {{ $name }}"></span>{{ $description }}</div><progress class="ov-meter" max="{{ max(1,$counts['total']) }}" value="{{ $counts[$name] }}" aria-label="{{ $label }}: {{ $counts[$name] }} dari {{ $counts['total'] }}"></progress></a>
 @endforeach
 </div>
 @if(!$isLicenses)
@@ -47,6 +49,7 @@ $points=fn($field)=>$chart->map(fn($item,$i)=>(45+$i*95).','.round(150-($item[$f
 <x-sales-details :sales="$sales"/>
 <div class="ov-section-heading"><div><div class="ov-kicker">05 / OPERATIONS</div><h2>Lisensi & aktivitas terbaru</h2></div></div>
 @endif
+@if($isLicenses)<div class="ov-section-heading"><div><div class="ov-kicker">02 / LICENSE DIRECTORY</div><h2>Direktori lisensi</h2></div></div>@endif
 <section class="panel license-panel"><div class="panel-heading"><div><h2>License keys <span class="count-tag">{{ $licenses->total() }}</span></h2><p>Setiap key, setiap perangkat, terpantau.</p></div>@if(!$isLicenses)<a href="{{ route('licenses') }}" class="text-link">Lihat semua <x-icon name="arrow" size="15"/></a>@endif</div>
 <x-list-filters scope="licenses" :games="$games"/>
 <div class="table-scroll bounded-table"><table><thead><tr><th>LICENSE / PELANGGAN</th><th>STATUS</th><th>PERANGKAT / HWID</th><th>MASA BERLAKU</th><th class="align-right">TINDAKAN</th></tr></thead><tbody>
@@ -56,7 +59,7 @@ $points=fn($field)=>$chart->map(fn($item,$i)=>(45+$i*95).','.round(150-($item[$f
 @empty<tr><td colspan="5"><div class="empty-state"><x-icon name="key" size="30"/><strong>{{ request('q')||request('status')?'Tidak ada key yang cocok':'Workspace Anda siap.' }}</strong><p>{{ request('q')||request('status')?'Coba pencarian atau filter lain.':'Buat key pertama untuk mulai menghubungkan perangkat.' }}</p>@unless(request('q')||request('status'))<button class="btn secondary" data-open-dialog="create-key">Buat key pertama <x-icon name="plus" size="16"/></button>@endunless</div></td></tr>@endforelse
 </tbody></table></div><div class="table-footer"><span>{{ $licenses->total() ? $licenses->firstItem().'–'.$licenses->lastItem().' dari '.$licenses->total().' keys' : '0 license keys' }}</span><div class="pagination">@if($licenses->previousPageUrl())<a class="btn secondary compact" href="{{ $licenses->previousPageUrl() }}">Sebelumnya</a>@endif<span>{{ $licenses->currentPage() }} / {{ max(1,$licenses->lastPage()) }}</span>@if($licenses->nextPageUrl())<a class="btn secondary compact" href="{{ $licenses->nextPageUrl() }}">Berikutnya</a>@endif</div></div></section>
 @if(!$isLicenses)<section class="panel activity-panel"><div class="panel-heading"><div><h2>Aktivitas terbaru</h2><p>Jejak akses dan perubahan lisensi.</p></div><a class="text-link" href="{{ route('activity') }}">Semua aktivitas <x-icon name="arrow" size="15"/></a></div>@forelse($events as $event)<x-event :event="$event"/>@empty<div class="empty-inline">Belum ada aktivitas. Aktivitas akan muncul setelah key dibuat atau API dipanggil.</div>@endforelse</section>@endif
-@unless($isLicenses)</div>@endunless
+</div>
 <x-create-key :games="$games" :products="$products"/>@foreach($licenses as $license)<x-license-dialogs :license="$license" :games="$games"/>@endforeach
 
 </x-layout>

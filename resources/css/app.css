@@ -397,3 +397,48 @@ body{font-size:15px}.page-heading p,.panel-heading p{line-height:1.85}.btn{min-h
 .overview-studio .ov-hero,.overview-studio .dashboard-charts>.panel,.overview-studio .sales-breakdowns>.panel{animation:ov-enter .45s ease both}
 .overview-studio .dashboard-charts>.panel:nth-child(2),.overview-studio .sales-breakdowns>.panel:nth-child(2){animation-delay:.07s}
 @media(prefers-reduced-motion:reduce){.overview-studio .ov-hero,.overview-studio .dashboard-charts>.panel,.overview-studio .sales-breakdowns>.panel{animation:none!important}}
+
+/* License directory and dedicated issuance dialog. */
+.license-studio .license-panel{overflow:hidden}
+.license-studio .license-panel>.panel-heading{padding:18px 20px}
+.license-studio .list-filters{padding:16px 20px;background:var(--ov-surface)}
+.license-studio .filter-primary{gap:10px;align-items:end}
+.license-studio .filter-bottom{gap:12px}
+.license-studio .table-scroll{scrollbar-width:thin}
+.license-studio .empty-state{min-height:190px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:9px}
+.license-studio .empty-state>svg{color:var(--ov-accent);margin:0}
+.license-studio .empty-state p{max-width:340px;margin:0;text-align:center}
+.license-studio .license-panel tbody tr:hover{background:var(--ov-soft)}
+.lk-create{width:min(760px,calc(100vw - 28px));max-width:none;max-height:min(90dvh,850px);padding:0;border:1px solid var(--line);border-radius:16px;overflow:auto;background:var(--panel);color:var(--text);font-family:'Manrope','Plus Jakarta Sans',system-ui,sans-serif}
+.lk-create[open]{animation:lk-modal-enter .3s cubic-bezier(.2,.8,.2,1) both}
+.lk-create::backdrop{background:#0a0710b3;backdrop-filter:blur(5px)}
+.lk-create>form{margin:0;padding:0;display:flex;flex-direction:column;gap:0}
+.lk-modal-header{position:sticky;top:0;z-index:2;display:flex;gap:13px;align-items:center;padding:20px 24px;border-bottom:1px solid var(--line);background:var(--panel)}
+.lk-modal-symbol{display:grid;place-items:center;flex:none;width:44px;height:44px;border-radius:10px;background:var(--mint-bg);color:var(--mint);border:1px solid var(--line)}
+.lk-modal-header>div{flex:1;min-width:0}
+.lk-kicker{font-size:10px;font-weight:700;color:var(--mint);letter-spacing:1.2px}
+.lk-modal-header h2{font-size:22px;line-height:1.25;letter-spacing:-.04em;margin:4px 0}
+.lk-modal-header p,.lk-section-title p{font-size:12px;color:var(--muted);margin:0;line-height:1.55}
+.lk-modal-header>.icon-btn{align-self:flex-start}
+.lk-modal-content{padding:0 24px}
+.lk-form-section{padding:20px 0;border-bottom:1px solid var(--line)}
+.lk-form-section:last-child{border-bottom:0}
+.lk-section-title{display:flex;gap:10px;align-items:center;margin-bottom:14px}
+.lk-section-title>span{display:grid;place-items:center;width:28px;height:28px;border:1px solid var(--line);border-radius:7px;color:var(--mint);font:600 11px ui-monospace,monospace}
+.lk-section-title h3{font-size:14px;font-weight:700;margin:0 0 3px}
+.lk-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.lk-create label{font-size:12px;font-weight:600}
+.lk-create input:not([type="checkbox"]),.lk-create textarea,.lk-create .select-trigger{font-family:inherit;font-size:13px;border-radius:8px}
+.lk-package-fields{display:grid;gap:14px;margin-top:14px}
+.lk-package-fields.is-package{opacity:.75}
+.lk-review{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:13px;margin:12px 0;background:var(--soft);border:1px solid var(--line);border-radius:9px}
+.lk-review small,.lk-review strong{display:block;overflow-wrap:anywhere}
+.lk-review small{font-size:10px;color:var(--muted);margin-bottom:4px}
+.lk-review strong{font-size:12px;color:var(--text);font-weight:700}
+.lk-create .hint-box{margin:0;font-size:11.5px}
+.lk-create .lk-modal-footer{position:sticky;bottom:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 24px;margin:0;background:var(--panel);border-top:1px solid var(--line)}
+.lk-modal-footer>span{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:10px}
+.lk-modal-footer>div{display:flex;gap:8px}
+@keyframes lk-modal-enter{from{opacity:0;translate:0 12px;scale:.985}to{opacity:1;translate:0 0;scale:1}}
+@media(max-width:640px){.lk-create{width:calc(100vw - 16px);max-height:95dvh}.lk-modal-header,.lk-create .lk-modal-footer{padding:14px}.lk-modal-content{padding:0 14px}.lk-fields{grid-template-columns:1fr}.lk-create .lk-modal-footer{flex-wrap:wrap}.lk-modal-footer>div{width:100%;justify-content:flex-end}.lk-modal-footer>span{width:100%}.lk-review{gap:6px;padding:9px}.license-studio .list-filters,.license-studio .license-panel>.panel-heading{padding:14px}}
+@media(prefers-reduced-motion:reduce){.lk-create,.lk-create *{animation:none!important;transition:none!important}}
