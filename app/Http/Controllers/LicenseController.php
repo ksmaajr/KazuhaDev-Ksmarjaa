@@ -16,7 +16,7 @@ class LicenseController extends Controller
 {
     public function store(StoreLicenseRequest $request, LicenseService $service): RedirectResponse
     {
-        [$license,$key] = $service->issue($request->validated(), $request->user()->id, $request->ip());
+        [$license,$key] = $service->issue($request->validated(), $request->user()->id, $request->ip(), $request->issuedPackage);
 
         return redirect()->route('licenses')->with('issued_key', $key)->with('success', 'Key berhasil dibuat. Durasi mulai saat aktivasi pertama di injector.');
     }

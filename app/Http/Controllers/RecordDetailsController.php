@@ -34,7 +34,7 @@ class RecordDetailsController extends Controller
         $timeline = [];
         $ownId = $request->attributes->get('member_license')?->id;
         $route = $member ? 'member.records.show' : 'records.show';
-        $date = fn ($value) => $value?->timezone('Asia/Jakarta')->format('d M Y, H:i:s').' WIB';
+        $date = fn ($value) => $value ? $value->timezone('Asia/Jakarta')->format('d M Y, H:i:s').' WIB' : null;
         $add = function (string $label, mixed $value) use (&$rows): void {
             $rows[] = ['label' => $label, 'value' => $value === null || $value === '' ? 'Belum tercatat' : (string) $value];
         };
@@ -134,6 +134,32 @@ class RecordDetailsController extends Controller
                     $add($label, $value);
                 }
                 if (! $member) {
+                    $created = $record->events()->where('action', 'created')->oldest('id')->first();
+                    $snapshot = $created?->metadata['issued_package'] ?? null;
+                    $purchase = PurchaseOrder::where('status', 'paid')
+                        ->where('issued_license_id', $record->id)
+                        ->where(fn ($query) => $query->whereNull('gateway_mode')->orWhere('gateway_mode', 'production'))
+                        ->latest('id')->first();
+                    $renewal = PurchaseOrder::where('status', 'paid')->where('purpose', 'renewal')
+                        ->where('owner_license_id', $record->id)
+                        ->where(fn ($query) => $query->whereNull('gateway_mode')->orWhere('gateway_mode', 'production'))
+                        ->latest('id')->first();
+                    $add('Paket penerbitan', $purchase?->product_name ?? ($snapshot['name'] ?? (($created?->metadata['issuance_source'] ?? null) === 'manual' ? 'Custom / tanpa paket' : 'Tidak tercatat')));
+                    $add('Sumber penerbitan', $purchase ? 'Pembelian terverifikasi' : ($created?->user_id ? 'Administrator' : 'Tidak tercatat'));
+                    $add('Durasi paket awal', $purchase ? LicenseDuration::label($purchase->duration_seconds ?? $purchase->days * 86400) : (isset($snapshot['duration_seconds']) ? LicenseDuration::label($snapshot['duration_seconds']) : null));
+                    $add('Paket perpanjangan terakhir', $renewal?->product_name);
+                    $add('Diterbitkan oleh', $created?->user_id ? User::find($created->user_id)?->name : null);
+                    $add('HWID perangkat', $record->hwid);
+                    $add('Status perangkat', $record->hwid_hash ? 'Terikat' : 'Belum terikat');
+                    $add('Waktu pengikatan', $date($record->bound_at));
+                    $add('Sisa masa berlaku', $record->expires_at ? LicenseDuration::label(max(0, $record->expires_at->getTimestamp() - now()->getTimestamp())) : 'Belum dimulai');
+                    $add('Dicabut', $date($record->revoked_at));
+                    if ($purchase) {
+                        $link('Pesanan penerbitan', 'order', $purchase->id);
+                    }
+                    if ($renewal) {
+                        $link('Perpanjangan terakhir', 'order', $renewal->id);
+                    }
                     $add('Catatan internal', $record->notes);
                     $add('Dihapus', $record->deleted_at ? $date($record->deleted_at) : null);
                 }

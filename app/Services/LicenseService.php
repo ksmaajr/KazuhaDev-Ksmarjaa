@@ -13,14 +13,14 @@ use Illuminate\Validation\ValidationException;
 
 class LicenseService
 {
-    public function issue(array $data, ?int $actorId, ?string $ip): array
+    public function issue(array $data, ?int $actorId, ?string $ip, ?array $package = null): array
     {
-        return DB::transaction(function () use ($data, $actorId, $ip): array {
+        return DB::transaction(function () use ($data, $actorId, $ip, $package): array {
             $plain = 'KF-'.implode('-', str_split(strtoupper(bin2hex(random_bytes(16))), 8));
             $duration = LicenseDuration::seconds($data);
             $license = LicenseKey::create(['label' => $data['label'], 'member_name' => $data['member_name'] ?? $data['label'], 'notes' => $data['notes'] ?? null, 'key_hash' => hash('sha256', $plain), 'key_hint' => 'KF-'.substr($plain, 3, 4).'••••'.substr($plain, -4), 'duration_seconds' => $duration, 'key_value' => $plain, 'expires_at' => null]);
             $license->games()->sync($data['game_ids'] ?? [Game::where('code', 'rules-of-survival')->firstOrFail()->id]);
-            $this->record($license, 'created', $ip, null, $actorId, ['game_ids' => $license->games()->allRelatedIds()->all()]);
+            $this->record($license, 'created', $ip, null, $actorId, ['game_ids' => $license->games()->allRelatedIds()->all(), 'issued_package' => $package, 'issuance_source' => 'manual']);
 
             return [$license, $plain];
         });
