@@ -149,17 +149,31 @@ class PaymentSafetyTest extends TestCase
         Http::fake(['api-pay-sandbox.sumopod.com/*' => function () use (&$url, &$order) {
             return Http::response(['payment_id' => 'payment-'.$order->id, 'order_id' => $order->number, 'amount' => $order->amount, 'payment_link_url' => $url], 201);
         }]);
-        foreach ([' //PAY-SANDBOX.SUMOPOD.COM/pay/test ' => true, 'https://sumopod.com.evil.example/pay/test' => false, 'http://pay-sandbox.sumopod.com/pay/test' => false] as $url => $valid) {
+        foreach ([' //PAY-SANDBOX.SUMOPOD.COM/pay/test ' => true, 'https://sumo.sandbox.pymnt.global/pay/test' => true, 'https://other.sandbox.pymnt.global/pay/test' => false, 'https://sumo.sandbox.pymnt.global.evil.example/pay/test' => false, 'https://sumopod.com.evil.example/pay/test' => false, 'http://pay-sandbox.sumopod.com/pay/test' => false] as $url => $valid) {
             $order = PurchaseOrder::factory()->create();
             try {
                 app(SumoPodService::class)->createLink($order);
                 $this->assertTrue($valid);
-                $this->assertSame('https://PAY-SANDBOX.SUMOPOD.COM/pay/test', $order->fresh()->gateway_payment_url);
+                $this->assertSame(str_starts_with(trim($url), '//') ? 'https:'.trim($url) : trim($url), $order->fresh()->gateway_payment_url);
             } catch (ValidationException) {
                 $this->assertFalse($valid);
                 $this->assertSame('uncertain', $order->fresh()->gateway_status);
                 $this->assertNull($order->fresh()->gateway_payment_url);
             }
+        }
+    }
+
+    public function test_sandbox_processor_host_is_not_allowed_in_production(): void
+    {
+        $this->configure('production');
+        $order = PurchaseOrder::factory()->create();
+        Http::fake(['api-pay.sumopod.com/*' => Http::response(['payment_id' => 'sandbox-host', 'order_id' => $order->number, 'amount' => $order->amount, 'payment_link_url' => 'https://sumo.sandbox.pymnt.global/pay/test'], 201)]);
+        try {
+            app(SumoPodService::class)->createLink($order);
+            $this->fail('Sandbox checkout host must not be accepted in production.');
+        } catch (ValidationException) {
+            $this->assertSame('uncertain', $order->fresh()->gateway_status);
+            $this->assertNull($order->fresh()->gateway_payment_url);
         }
     }
 

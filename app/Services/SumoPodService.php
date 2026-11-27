@@ -69,7 +69,7 @@ class SumoPodService
             $diagnostics['payment_id_present'] = is_array($data) && ! empty($data['payment_id']);
             $diagnostics['order_matches'] = is_array($data) && ($data['order_id'] ?? null) === $order->number;
             $diagnostics['amount_matches'] = is_array($data) && is_numeric($data['amount'] ?? null) && (float) $data['amount'] === (float) $order->amount;
-            $diagnostics['payment_url_valid'] = $scheme === 'https' && ($host === 'sumopod.com' || str_ends_with($host, '.sumopod.com')) && filter_var($url, FILTER_VALIDATE_URL) !== false && ! isset($parts['user']) && ! isset($parts['pass']) && (! isset($parts['port']) || $parts['port'] === 443) && ! str_contains($url, '\\');
+            $diagnostics['payment_url_valid'] = $scheme === 'https' && ($host === 'sumopod.com' || str_ends_with($host, '.sumopod.com') || ($mode === 'sandbox' && $host === 'sumo.sandbox.pymnt.global')) && filter_var($url, FILTER_VALIDATE_URL) !== false && ! isset($parts['user']) && ! isset($parts['pass']) && (! isset($parts['port']) || $parts['port'] === 443) && ! str_contains($url, '\\');
             $diagnostics['fee_present'] = isset($data['fee']);
             $diagnostics['expires_at_present'] = isset($data['expires_at']);
             if (! is_array($data) || ! $diagnostics['payment_id_present'] || ! is_scalar($data['payment_id']) || ! $diagnostics['order_matches'] || ! $diagnostics['amount_matches'] || ! $diagnostics['payment_url_valid']) {
