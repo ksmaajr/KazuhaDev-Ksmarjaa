@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateGameRequest;
 use App\Models\Game;
 use App\Models\LicenseEvent;
 use App\Models\LicenseKey;
+use App\Models\PurchaseOrder;
 use App\Services\GameReleaseService;
 use App\Support\ListFilters;
 use Illuminate\Http\RedirectResponse;
@@ -64,6 +65,7 @@ class GameController extends Controller
             if ($request->routeIs('member.*')) {
                 $license = LicenseKey::whereKey($request->attributes->get('member_license')->id)->lockForUpdate()->firstOrFail();
                 abort_if($license->revoked_at || $license->expires_at?->lessThanOrEqualTo(now()), 403);
+                abort_if(PurchaseOrder::where('issued_license_id', $license->id)->where('gateway_mode', 'sandbox')->exists(), 403);
             }
             $current = Game::whereKey($game->id)->lockForUpdate()->firstOrFail();
             if ($license) {
