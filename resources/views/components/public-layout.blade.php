@@ -46,4 +46,31 @@
 .storefront-body .btn{font-weight:650;letter-spacing:.005em}
 .storefront-body .invoice-facts dd{font-variant-numeric:tabular-nums}
 .storefront-body .receipt-reference strong,.storefront-body .paid-key code{font-family:'Cascadia Mono','Consolas',ui-monospace,monospace}
+
+/* Premium public chrome and high-contrast light checkout. */
+.storefront-body .store-header-v2{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:18px;padding:13px 20px;border-radius:16px;isolation:isolate}
+.storefront-body .store-header-v2 .member-header-actions{justify-self:end}
+.storefront-body .store-header-v2 .store-header-nav a{padding:11px 15px;border:1px solid var(--line);border-radius:10px}
+.storefront-body .store-header-v2 .brand-mark{box-shadow:0 3px 12px #ad66cf35}
+.storefront-body .store-header-v2 .store-member-cta{font-weight:700;min-height:42px}
+:root[data-theme="light"] .storefront-body .store-header-v2{background:linear-gradient(115deg,#201b29,#33263d);border-color:#54415f;box-shadow:0 9px 25px #281d3530}
+:root[data-theme="light"] .storefront-body .store-header-v2 .store-header-nav a{background:#403349;color:#f4d6ef;border-color:#685373}
+:root[data-theme="light"] .storefront-body .store-header-v2 .store-member-cta{background:linear-gradient(110deg,#b43f87,#8256bc);color:white}
+:root[data-theme="light"] .storefront-body .checkout-studio .invoice-hero{--panel:#292233;--soft:#382e43;--line:#594963;--text:#fff;--muted:#ddd0e5;--mint:#f2b3df;--mint-bg:#503248;--invoice-pink:#f2b3df;--invoice-violet:#dac0fa;--invoice-cyan:#9ee3f2;--invoice-success:#a5e4c8;background:radial-gradient(ellipse at 100% 0%,#694775 0%,transparent 65%),linear-gradient(125deg,#231e2b,#30263b);color:var(--text);border:1px solid #594963;box-shadow:0 12px 30px #30213d22}
+:root[data-theme="light"] .storefront-body .checkout-studio .invoice-hero .payment-result h1{color:#fff}
+:root[data-theme="light"] .storefront-body .checkout-studio .invoice-hero .payment-result p{color:#e1d6e7}
+:root[data-theme="light"] .storefront-body .checkout-studio .invoice-hero .payment-result .eyebrow{color:#f2b3df;justify-content:flex-start;text-align:left}
+:root[data-theme="light"] .storefront-body .checkout-studio .invoice-hero .invoice-brand-chip{color:#dec4fa}
+:root[data-theme="light"] .storefront-body .checkout-studio .invoice-hero .invoice-status-pill{color:#ffd3ee;background:#56364f;border-color:#a86d96}
+:root[data-theme="light"] .storefront-body .checkout-studio[data-invoice-state="success"] .invoice-hero .invoice-status-pill{color:#b8f1d8;background:#28463e;border-color:#528774}
+:root[data-theme="light"] .storefront-body .checkout-studio[data-invoice-state="cancelled"] .invoice-hero .invoice-status-pill{color:#ffd3dc;background:#50303a;border-color:#a16b7b}
+:root[data-theme="light"] .storefront-body .checkout-studio .invoice-progress>li{background:#382e43;border-color:#66556f;color:#e3d9e9}
+:root[data-theme="light"] .storefront-body .checkout-studio .invoice-progress>li strong{color:inherit}
+:root[data-theme="light"] .storefront-body .checkout-studio .invoice-progress>li small{color:#d4c7dc}
+:root[data-theme="light"] .storefront-body .checkout-studio .invoice-progress>li.is-complete{background:#253e3a;border-color:#527f71;color:#b6efd6}
+:root[data-theme="light"] .storefront-body .checkout-studio .invoice-progress>li.is-current{background:#523249;border-color:#e1a2cd;color:#ffd3ef}
+:root[data-theme="light"] .storefront-body .checkout-studio .invoice-progress>li.is-complete small,:root[data-theme="light"] .storefront-body .checkout-studio .invoice-progress>li.is-current small{color:inherit}
+:root[data-theme="light"] .storefront-body .store-redesign .store-pending-live{background:linear-gradient(115deg,#fff,#f4e5f3);border-color:#b579ad;border-left-color:#9d3479}
+:root[data-theme="light"] .storefront-body .store-redesign .store-pending-live:before{background:linear-gradient(110deg,transparent 22%,#b64e9b25 48%,transparent 72%)}
+@media(max-width:760px){.storefront-body .store-header-v2{display:flex;flex-wrap:wrap;padding:12px 14px;gap:12px}}
 </style></head><body class="member-body storefront-body"><header class="member-header store-header-v2"><a class="brand" href="{{ route('home') }}"><img class="brand-mark admin-brand-mark kz-brand-image" src="{{ asset('kz-brand.webp') }}" width="44" height="44" alt=""><span class="store-brand-copy"><strong>KazuhaDev<span class="brand-dot">.</span></strong><small>LICENSE STORE</small></span></a><nav class="store-header-nav" aria-label="Navigasi toko"><a href="{{ route('shop') }}" @if(request()->routeIs('home','shop')) aria-current="page" @endif><x-icon name="package" size="16"/> Katalog lisensi</a></nav><div class="member-header-actions"><a class="btn primary compact store-member-cta" href="{{ $license ? route('member.dashboard') : route('member.login') }}"><x-icon name="user" size="16"/> {{ $license?'Dashboard member':'Masuk member' }} <x-icon name="arrow" size="14"/></a><x-theme-toggle/></div></header><main class="storefront-main"><x-flash-messages/><div data-live-content>{{ $slot }}</div><footer class="footer"><span>© {{ now()->year }} KazuhaDev.</span><span>Lisensi perangkat · Masa berlaku sejak aktivasi</span></footer></main><x-feedback/></body></html>
