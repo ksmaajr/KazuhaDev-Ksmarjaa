@@ -39,5 +39,12 @@ document.addEventListener('click',event=>{
  const filtered=!!link.closest('.list-filters,.record-pagination,.pagination,.table-footer');const admin=document.body.dataset.sidebarScope==='admin'&&adminPaths.has(url.pathname);
  if(!filtered&&!admin)return;event.preventDefault();clearTimeout(debounce);loadView(url.href,{historyMode:filtered?'replace':'push',scroll:admin&&!filtered});
 });
-window.addEventListener('popstate',event=>loadView(event.state?.kzViewUrl||location.href,{historyMode:'none',scroll:true}));
+window.addEventListener('popstate',event=>{
+ const target=new URL(event.state?.kzViewUrl||location.href,location.origin);
+ if(document.body.dataset.sidebarScope!=='admin' && (target.pathname.startsWith('/member') || document.body.dataset.sidebarScope==='member')){location.reload();return;}
+ loadView(target.href,{historyMode:'none',scroll:true});
+});
+window.addEventListener('pageshow',event=>{
+ if(event.persisted && (document.body.dataset.sidebarScope==='member' || location.pathname.startsWith('/member') || document.body.classList.contains('storefront-body'))) location.reload();
+});
 const saved=history.state?.kzViewUrl;if(location.search){cleanHistory(currentUrl);}else if(saved&&new URL(saved).pathname===location.pathname&&new URL(saved).search){queueMicrotask(()=>loadView(saved,{historyMode:'none'}));}else{cleanHistory(currentUrl);}
