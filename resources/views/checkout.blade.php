@@ -96,7 +96,7 @@
 .checkout-studio .invoice-progress>li{padding:13px;border:1px solid var(--line);border-radius:12px;background:var(--soft);min-width:0}
 .checkout-studio .invoice-progress>li:after{display:none}
 .checkout-studio .invoice-progress>li.is-current{border-color:var(--mint);background:var(--mint-bg)}
-.checkout-studio .invoice-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);gap:18px;margin-top:18px;align-items:stretch;border:0}
+.checkout-studio .invoice-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);gap:18px;margin-top:18px;align-items:start;border:0}
 .checkout-studio .invoice-summary,.checkout-studio .invoice-payment{padding:25px;border:1px solid var(--line);border-radius:var(--studio-radius);background:var(--panel);min-width:0}
 .checkout-studio .invoice-section-title{font-size:19px;font-weight:700;letter-spacing:-.025em;margin-bottom:20px}
 .checkout-studio .receipt-reference{border-radius:13px;background:var(--soft);padding:16px}
@@ -156,5 +156,6 @@
 .checkout-studio .studio-order-status.is-paid{color:var(--invoice-success)}
 .checkout-studio .studio-order-group .studio-order-total dd{font-size:20px;font-weight:750;letter-spacing:-.04em}
 .checkout-studio .invoice-summary .invoice-assurance{margin-top:18px}
+.checkout-studio .invoice-payment{align-self:start;height:auto;min-height:0}
 </style>
 </x-public-layout>
