@@ -799,5 +799,5 @@ body{font-size:15px}.page-heading p,.panel-heading p{line-height:1.85}.btn{min-h
 @media(max-width:600px){.gm-identity-grid{grid-template-columns:minmax(0,1fr)}.gm-editor-v3 .gm-identity-section{padding:12px}.gm-editor-v3 .gm-identity-heading .gm-symbol{width:38px;height:38px}}
 
 /* Responsive width for game catalog create/edit dialogs. */
-dialog.modal.gm-editor-v3{box-sizing:border-box;width:min(880px,calc(100% - 32px));max-width:calc(100% - 32px);margin:auto}
+dialog.modal.gm-editor-v3{box-sizing:border-box;width:min(720px,calc(100% - 40px));max-width:calc(100% - 40px);max-height:min(85dvh,780px);margin:auto;padding:22px}
 @media(max-width:600px){dialog.modal.gm-editor-v3{width:calc(100% - 20px);max-width:calc(100% - 20px)}}
