@@ -356,3 +356,69 @@ for(const eventName of ['input','change','click']){
  }
  });
 }
+
+
+// Renewal carousel: filters only the presentation, never the submitted price or duration.
+function refreshRenewalCards(dialog) {
+    const track = dialog.querySelector('[data-renew-track]');
+    if (!track) return;
+    const search = (dialog.querySelector('[data-renew-search]')?.value || '').trim().toLocaleLowerCase('id-ID');
+    const filter = dialog.querySelector('[data-renew-filter]')?.value || 'all';
+    const cards = [...track.querySelectorAll('[data-renew-card]')];
+    let count = 0;
+    for (const card of cards) {
+        const seconds = Number(card.dataset.duration);
+        const matchesDuration = filter === 'all' || (filter === 'short' && seconds <= 86400) || (filter === 'medium' && seconds > 86400 && seconds <= 604800) || (filter === 'long' && seconds > 604800);
+        const matchesSearch = card.textContent.toLocaleLowerCase('id-ID').includes(search);
+        const visible = matchesDuration && matchesSearch;
+        const radio = card.querySelector('input[type="radio"]');
+        if (!visible) radio.checked = false;
+        radio.disabled = !visible;
+        card.hidden = !visible;
+        if (visible) count++;
+    }
+    const counter = dialog.querySelector('[data-renew-count]');
+    if (counter) counter.textContent = count + ' dari ' + cards.length + ' paket';
+    const empty = dialog.querySelector('[data-renew-no-results]');
+    if (empty) empty.hidden = count !== 0 || cards.length === 0;
+    track.scrollLeft = 0;
+    updateRenewalControls(dialog);
+}
+function updateRenewalControls(dialog) {
+    const track = dialog.querySelector('[data-renew-track]');
+    if (!track) return;
+    const prev = dialog.querySelector('[data-renew-scroll="-1"]');
+    const next = dialog.querySelector('[data-renew-scroll="1"]');
+    if (prev) prev.disabled = track.scrollLeft <= 2;
+    if (next) next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
+    const submit = dialog.querySelector('.ms-renew-submit');
+    if (submit && !submit.dataset.submitting) submit.disabled = !dialog.querySelector('[data-renew-card] input:checked:not(:disabled)');
+}
+document.addEventListener('input', event => {
+    if (event.target.matches('[data-renew-search]')) refreshRenewalCards(event.target.closest('dialog'));
+});
+document.addEventListener('change', event => {
+    const dialog = event.target.closest('#member-renew-dialog');
+    if (!dialog) return;
+    if (event.target.matches('[data-renew-filter]')) refreshRenewalCards(dialog);
+    else if (event.target.matches('input[name="product_id"]')) updateRenewalControls(dialog);
+});
+document.addEventListener('click', event => {
+    const opener = event.target.closest('[data-open-dialog="member-renew-dialog"]');
+    if (opener) requestAnimationFrame(() => {
+        const dialog = document.getElementById('member-renew-dialog');
+        if (dialog) refreshRenewalCards(dialog);
+    });
+    const arrow = event.target.closest('[data-renew-scroll]');
+    if (!arrow) return;
+    const track = arrow.closest('dialog').querySelector('[data-renew-track]');
+    const width = track.querySelector('[data-renew-card]:not([hidden])')?.getBoundingClientRect().width || track.clientWidth;
+    track.scrollBy({left:Number(arrow.dataset.renewScroll)*(width+10),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+});
+document.addEventListener('scroll', event => {
+    if (event.target.matches?.('[data-renew-track]')) updateRenewalControls(event.target.closest('dialog'));
+}, true);
+window.addEventListener('resize', () => {
+    const dialog = document.querySelector('#member-renew-dialog[open]');
+    if (dialog) updateRenewalControls(dialog);
+});
