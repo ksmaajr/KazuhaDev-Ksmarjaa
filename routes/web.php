@@ -21,6 +21,8 @@ Route::get('/game-artwork/{game}/{kind}', [GameController::class, 'artwork'])->w
 Route::get('/', [StorefrontController::class, 'index'])->name('home');
 Route::get('/shop', [StorefrontController::class, 'index'])->name('shop');
 Route::post('/checkout', [StorefrontController::class, 'checkout'])->middleware('throttle:10,1')->name('checkout.store');
+Route::get('/payment/success', [StorefrontController::class, 'paymentReturn'])->middleware('throttle:60,1')->name('payment.success');
+Route::get('/payment/cancel', [StorefrontController::class, 'paymentReturn'])->middleware('throttle:60,1')->name('payment.cancel');
 Route::get('/checkout/{order:number}', [StorefrontController::class, 'receipt'])->name('checkout.receipt');
 Route::get('/checkout/{order:number}/status', [StorefrontController::class, 'status'])->middleware('throttle:60,1')->name('checkout.status');
 Route::post('/checkout/{order:number}/payment', [StorefrontController::class, 'payment'])->middleware('throttle:10,1')->name('checkout.payment');

@@ -247,6 +247,29 @@ class PaymentSafetyTest extends TestCase
         $this->assertDatabaseCount('financial_transactions', 0);
     }
 
+    public function test_payment_returns_redirect_only_to_session_owned_invoice_without_fulfilling(): void
+    {
+        $order = $this->order('sandbox', ['owner_license_id' => null, 'guest_token_hash' => hash('sha256', 'guest-secret')]);
+        $keys = LicenseKey::count();
+        foreach (['success', 'cancel'] as $result) {
+            $this->withSession(['checkout_secret' => 'guest-secret', 'payment_return_order' => $order->number])
+                ->get('/payment/'.$result.'?status=paid&order_id=untrusted')
+                ->assertRedirect(route('checkout.receipt', ['order' => $order->number]));
+        }
+        $this->assertSame('pending', $order->fresh()->status);
+        $this->assertDatabaseCount('license_keys', $keys);
+        $this->assertDatabaseCount('financial_transactions', 0);
+    }
+
+    public function test_payment_return_rejects_missing_or_foreign_session(): void
+    {
+        $order = $this->order('sandbox', ['owner_license_id' => null, 'guest_token_hash' => hash('sha256', 'guest-secret')]);
+        $this->get('/payment/success?order_id='.$order->number)->assertRedirect(route('home'));
+        $this->withSession(['checkout_secret' => 'other-secret', 'payment_return_order' => $order->number])
+            ->get('/payment/cancel')->assertRedirect(route('home'))->assertSessionMissing('payment_return_order');
+        $this->assertSame('pending', $order->fresh()->status);
+    }
+
     public function test_gateway_secrets_are_encrypted_never_rendered_and_blank_keeps_existing(): void
     {
         $admin = User::factory()->create();

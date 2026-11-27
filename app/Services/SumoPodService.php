@@ -36,7 +36,7 @@ class SumoPodService
             return $order->fresh();
         }
         try {
-            $response = Http::acceptJson()->asJson()->withoutRedirecting()->withHeaders(['X-Api-Key' => PaymentSettings::secret('api_key', $mode)])->connectTimeout(4)->timeout(8)->post($mode === 'sandbox' ? 'https://api-pay-sandbox.sumopod.com/api/v1/payments' : 'https://api-pay.sumopod.com/api/v1/payments', ['order_id' => $order->number, 'amount' => $order->amount, 'currency' => 'IDR', 'expires_in_hours' => 24, 'payment_method_type_code' => $method, 'success_return_url' => route('checkout.receipt', $order), 'cancel_return_url' => route('checkout.receipt', $order)]);
+            $response = Http::acceptJson()->asJson()->withoutRedirecting()->withHeaders(['X-Api-Key' => PaymentSettings::secret('api_key', $mode)])->connectTimeout(4)->timeout(8)->post($mode === 'sandbox' ? 'https://api-pay-sandbox.sumopod.com/api/v1/payments' : 'https://api-pay.sumopod.com/api/v1/payments', ['order_id' => $order->number, 'amount' => $order->amount, 'currency' => 'IDR', 'expires_in_hours' => 24, 'payment_method_type_code' => $method, 'success_return_url' => route('checkout.receipt', ['order' => $order->number]), 'cancel_return_url' => route('checkout.receipt', ['order' => $order->number])]);
             if (! $response->successful()) {
                 throw new \RuntimeException('Gateway rejected request.');
             }

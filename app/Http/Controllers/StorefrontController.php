@@ -60,7 +60,7 @@ class StorefrontController extends Controller
             $order = $service->guestOrder($data, (int) $data['product_id'], $data['idempotency_key'], hash('sha256', $request->session()->get('checkout_secret')), $request->ip());
         }
 
-        return redirect()->route('checkout.receipt', $order);
+        return redirect()->route('checkout.receipt', ['order' => $order->number]);
     }
 
     public function renewOrder(Request $request, PurchaseService $service): RedirectResponse
@@ -68,16 +68,34 @@ class StorefrontController extends Controller
         $data = $request->validate(['product_id' => ['required', 'integer', 'exists:license_products,id'], 'idempotency_key' => ['required', 'uuid']]);
         $order = $service->order($request->attributes->get('member_license'), (int) $data['product_id'], $data['idempotency_key'], $request->ip(), true);
 
-        return redirect()->route('checkout.receipt', $order);
+        return redirect()->route('checkout.receipt', ['order' => $order->number]);
     }
 
-    private function authorizeOrder(Request $request, PurchaseOrder $order): void
+    private function canAccessOrder(Request $request, PurchaseOrder $order): bool
     {
         $guest = $request->session()->get('checkout_secret');
         $ownGuest = $guest && $order->guest_token_hash && hash_equals($order->guest_token_hash, hash('sha256', $guest));
         $member = LicenseKey::find($request->session()->get('member_license_id'));
         $ownMember = $member && ! $member->revoked_at && $order->owner_license_id === $member->id;
-        abort_unless($ownGuest || $ownMember || ($request->user() && $request->user()->role === 'admin'), 404);
+        return $ownGuest || $ownMember || ($request->user() && $request->user()->role === 'admin');
+    }
+
+    private function authorizeOrder(Request $request, PurchaseOrder $order): void
+    {
+        abort_unless($this->canAccessOrder($request, $order), 404);
+    }
+
+    public function paymentReturn(Request $request): RedirectResponse
+    {
+        $number = $request->session()->get('payment_return_order');
+        $order = is_string($number) ? PurchaseOrder::where('number', $number)->first() : null;
+        if (! $order || ! $order->gateway_payment_id || ! $this->canAccessOrder($request, $order)) {
+            $request->session()->forget('payment_return_order');
+
+            return redirect()->route('home')->with('error', 'Detail pembayaran tidak tersedia di sesi ini. Buka kembali invoice asli atau hubungi admin.')->header('Cache-Control', 'private, no-store');
+        }
+
+        return redirect()->route('checkout.receipt', ['order' => $order->number])->header('Cache-Control', 'private, no-store');
     }
 
     public function receipt(Request $request, PurchaseOrder $order): View
@@ -91,9 +109,12 @@ class StorefrontController extends Controller
     {
         $this->authorizeOrder($request, $order);
         $data = $request->validate(['method' => ['required', 'in:QRIS,QRIS_INSTANT']]);
-        $service->createLink($order, $data['method']);
+        $invoice = $service->createLink($order, $data['method']);
+        if ($invoice->gateway_payment_id) {
+            $request->session()->put('payment_return_order', $invoice->number);
+        }
 
-        return redirect()->route('checkout.receipt', $order);
+        return redirect()->route('checkout.receipt', ['order' => $order->number]);
     }
 
     public function status(Request $request, PurchaseOrder $order): JsonResponse
