@@ -386,3 +386,14 @@ body{font-size:15px}.page-heading p,.panel-heading p{line-height:1.85}.btn{min-h
 @media(max-width:760px){.ov-hero{grid-template-columns:1fr;gap:16px}.ov-hero-side{border-left:0;border-top:1px solid var(--ov-border);padding:16px 0 0}.overview-studio{gap:14px}.ov-section-heading{align-items:flex-start}.ov-section-heading>.ov-muted{max-width:42%;text-align:right}.overview-studio .sales-mini-facts{grid-template-columns:repeat(2,minmax(0,1fr))}.overview-studio .dashboard-charts{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:380px){.overview-studio .stats-grid,.overview-studio .sales-metrics{grid-template-columns:minmax(0,1fr)}.ov-section-heading{flex-wrap:wrap}}
 @media(prefers-reduced-motion:reduce){.overview-studio *,.overview-studio *::before,.overview-studio *::after{animation:none!important;transition:none!important}}
+
+.overview-studio .ov-validation-controls{display:flex;flex-wrap:wrap;gap:6px}
+.overview-studio .ov-validation-controls button{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--ov-border);background:var(--ov-soft);color:var(--ov-ink);padding:6px 9px;border-radius:6px;font:inherit;font-size:11px;cursor:pointer;transition:opacity .2s,background .2s}
+.overview-studio .ov-validation-controls button[aria-pressed="false"]{opacity:.55;background:transparent}
+.overview-studio .ov-validation-controls button i{background:var(--ov-accent)}
+.overview-studio .ov-validation-controls button i.denied{background:#7d88a3}
+.overview-studio [data-ov-series][hidden]{display:none!important}
+.ov-chart-empty{font-size:11.5px;color:var(--ov-muted);padding:10px 18px;margin:0}
+.overview-studio .ov-hero,.overview-studio .dashboard-charts>.panel,.overview-studio .sales-breakdowns>.panel{animation:ov-enter .45s ease both}
+.overview-studio .dashboard-charts>.panel:nth-child(2),.overview-studio .sales-breakdowns>.panel:nth-child(2){animation-delay:.07s}
+@media(prefers-reduced-motion:reduce){.overview-studio .ov-hero,.overview-studio .dashboard-charts>.panel,.overview-studio .sales-breakdowns>.panel{animation:none!important}}

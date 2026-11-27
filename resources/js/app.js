@@ -203,3 +203,18 @@ if (adminSignIn) {
         status.textContent = '';
     });
 }
+
+// Delegated overview chart controls also work after live navigation.
+document.addEventListener('click', event => {
+    const toggle = event.target.closest('[data-ov-series-toggle]');
+    if (!toggle) return;
+    const panel = toggle.closest('.chart-panel');
+    if (!panel) return;
+    const show = toggle.getAttribute('aria-pressed') !== 'true';
+    toggle.setAttribute('aria-pressed', String(show));
+    panel.querySelectorAll('[data-ov-series]').forEach(node => {
+        if (node.dataset.ovSeries === toggle.dataset.ovSeriesToggle) {
+            node.toggleAttribute('hidden', !show);
+        }
+    });
+});
