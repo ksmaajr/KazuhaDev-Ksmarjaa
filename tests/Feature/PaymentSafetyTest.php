@@ -215,6 +215,25 @@ class PaymentSafetyTest extends TestCase
         $this->assertDatabaseCount('purchase_orders', 2);
     }
 
+    public function test_storefront_resumes_only_session_owned_pending_invoice(): void
+    {
+        $product = LicenseProduct::factory()->create(['is_active' => true]);
+        $buyer = ['member_name' => 'Guest', 'customer_contact' => 'Test contact'];
+        $service = app(PurchaseService::class);
+        $own = $service->guestOrder($buyer, $product->id, (string) Str::uuid(), hash('sha256', 'guest-secret'), null);
+        $other = $service->guestOrder($buyer, $product->id, (string) Str::uuid(), hash('sha256', 'other-secret'), null);
+        $this->withSession(['checkout_secret' => 'guest-secret'])->get('/shop')
+            ->assertOk()->assertSee($own->number)->assertDontSee($other->number)
+            ->assertSee('Lanjutkan invoice')->assertDontSee('data-open-dialog="checkout-product-'.$product->id.'"', false);
+        $this->post('/checkout', ['product_id' => $product->id])
+            ->assertRedirect(route('checkout.receipt', ['order' => $own->number]));
+        $this->assertDatabaseCount('purchase_orders', 2);
+        $this->get('/checkout/'.$other->number)->assertNotFound();
+        $own->update(['status' => 'cancelled']);
+        $this->get('/shop')->assertOk()->assertDontSee($own->number)
+            ->assertSee('data-open-dialog="checkout-product-'.$product->id.'"', false);
+    }
+
     public function test_renewal_is_applied_once_to_same_key_and_keeps_hwid_and_activation(): void
     {
         $this->freezeTime();
@@ -279,7 +298,7 @@ class PaymentSafetyTest extends TestCase
     {
         $order = PurchaseOrder::factory()->create(['owner_license_id' => null, 'guest_token_hash' => hash('sha256', 'guest-secret')]);
         $this->get('/checkout/'.$order->number)->assertNotFound();
-        $this->withSession(['checkout_secret' => 'guest-secret'])->get('/checkout/'.$order->number.'?status=paid')->assertOk()->assertSee('Selesaikan langkah terakhir.');
+        $this->withSession(['checkout_secret' => 'guest-secret'])->get('/checkout/'.$order->number.'?status=paid')->assertOk()->assertSee('Selesaikan pembayaran.');
         $this->assertSame('pending', $order->fresh()->status);
         $this->assertDatabaseCount('financial_transactions', 0);
     }
