@@ -51,6 +51,20 @@
 @media(max-width:1050px){.ms-overview-grid{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:700px){.member-studio .member-grid{grid-template-columns:minmax(0,1fr)}.member-studio .ms-content{gap:14px}.member-studio .ms-welcome{flex-wrap:wrap;gap:12px}.member-studio .member-countdown{padding:10px 14px 16px;gap:5px}.member-studio .member-countdown>div{padding:10px 2px}.member-studio .duration-panel .panel-heading,.member-studio .duration-meta{padding-inline:14px}}
 @media(prefers-reduced-motion:reduce){.member-studio .ms-content>*{animation:none!important}.member-studio .ms-library .game-card:hover{transform:none}}
+
+/* Consistent charcoal dashboard cards on the light canvas. */
+:root[data-theme="light"] .member-studio .ms-content :is(.member-key,.duration-panel,.member-device,.renewal-panel,.ms-library .game-card){--panel:#292233;--soft:#382e43;--field:#211b2b;--line:#594963;--text:#f9f3fc;--muted:#d4c5de;--mint:#efb3df;--mint-bg:#493349;--red:#ffb5c4;--accent-purple:#cdb3f3;color:var(--text);background:radial-gradient(ellipse at 100% 0%,#a77ac315,transparent 65%),var(--panel);border-color:var(--line);box-shadow:0 7px 20px #30213d16}
+:root[data-theme="light"] .member-studio .ms-content :is(.member-key,.duration-panel,.member-device,.renewal-panel,.ms-library .game-card) :is(h2,h3,strong,dd){color:var(--text)}
+:root[data-theme="light"] .member-studio .ms-content :is(.member-key,.duration-panel,.member-device,.renewal-panel,.ms-library .game-card) :is(p,dt,small,.field-help,.game-card-description){color:var(--muted)}
+:root[data-theme="light"] .member-studio .member-grid .panel-heading{background:var(--soft);border-color:var(--line)}
+:root[data-theme="light"] .member-studio :is(.member-key code,.hwid-value,.renewal-steps>span,.member-countdown>div){background:var(--soft);border-color:var(--line);color:var(--mint)}
+:root[data-theme="light"] .member-studio .member-countdown strong{color:var(--mint)}
+:root[data-theme="light"] .member-studio .member-facts>div{border-color:var(--line)}
+:root[data-theme="light"] .member-studio .ms-content :is(.member-key,.member-device,.renewal-panel,.ms-library .game-card) .btn.secondary{background:var(--soft);color:var(--text);border-color:var(--line)}
+:root[data-theme="light"] .member-studio .ms-content :is(.renewal-panel,.ms-library .game-card) .btn.primary{background:linear-gradient(110deg,#efb3df,#c5a8ef);color:#30203a;border-color:transparent}
+:root[data-theme="light"] .member-studio .ms-content .btn:disabled{opacity:.55;cursor:not-allowed}
+:root[data-theme="light"] .member-studio .ms-library .empty-state{background:#292233;border:1px solid #594963;border-radius:18px;color:#f9f3fc;padding:26px;--muted:#d4c5de;--mint:#efb3df}
+:root[data-theme="light"] .member-studio .ms-library .empty-state p{color:#d4c5de}
 </style><style>
 body.member-with-sidebar{font-family:'Manrope','Plus Jakarta Sans','Segoe UI Variable','Segoe UI',system-ui,sans-serif}
 .member-with-sidebar .member-app-shell .member-header{background:var(--panel);border-bottom:1px solid var(--line);box-shadow:0 3px 18px #0000000b}
