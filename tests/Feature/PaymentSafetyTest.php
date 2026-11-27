@@ -333,13 +333,13 @@ class PaymentSafetyTest extends TestCase
             ->assertSee('Pembayaran online sudah diaktifkan, tetapi verifikasi webhook Demo / Sandbox belum dikonfigurasi.')
             ->assertDontSee('id="checkout-method"', false)
             ->assertDontSee('Pembayaran online belum diaktifkan.');
-        $this->post('/checkout/'.$order->number.'/payment', ['method' => 'QRIS'])->assertSessionHasErrors('payment');
+        $this->post('/checkout/'.$order->number.'/payment', ['method' => 'QRIS', 'accept_terms' => '1'])->assertSessionHasErrors('payment');
         Http::assertNothingSent();
 
         $this->put('/payment-settings', ['mode' => 'sandbox', 'enabled' => '1', 'sandbox_webhook_token' => 'readiness-test-webhook-token'])->assertSessionHasNoErrors();
         $this->assertTrue(PaymentSettings::ready());
         $this->get('/payment-settings')->assertOk()->assertSee('Konfigurasi pembayaran siap.')->assertSee('Kredensial lengkap')->assertDontSee('readiness-test-api-key')->assertDontSee('readiness-test-webhook-token');
-        $this->get('/checkout/'.$order->number)->assertOk()->assertSee('id="checkout-method"', false)->assertSee('QRIS · semua aplikasi pembayaran')->assertSee('QRIS Instant · demo');
+        $this->get('/checkout/'.$order->number)->assertOk()->assertSee('name="method"', false)->assertSee('Semua aplikasi pembayaran QRIS')->assertSee('QRIS Instant')->assertSee('name="accept_terms"', false);
         $this->assertSame('pending', $order->fresh()->status);
         $this->assertNull($order->fresh()->gateway_payment_id);
         $this->assertDatabaseCount('financial_transactions', 0);
