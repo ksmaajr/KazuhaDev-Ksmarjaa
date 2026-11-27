@@ -12,11 +12,11 @@ class Game extends Model
 
     protected $guarded = [];
 
-    protected $hidden = ['injector_path', 'dll_path', 'banner_path', 'logo_path'];
+    protected $hidden = ['injector_path', 'dll_path', 'banner_path', 'logo_path', 'dll_variants'];
 
     protected function casts(): array
     {
-        return ['injector_size' => 'integer', 'dll_size' => 'integer'];
+        return ['injector_size' => 'integer', 'dll_size' => 'integer', 'dll_variants' => 'array'];
     }
 
     public function artworkUrl(string $kind): ?string

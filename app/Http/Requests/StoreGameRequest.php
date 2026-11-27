@@ -23,6 +23,12 @@ class StoreGameRequest extends FormRequest
             'release_version' => ['nullable', 'string', 'max:50'],
             'injector_file' => ['nullable', 'file', 'max:20480', 'extensions:exe,zip'],
             'dll_file' => ['nullable', 'file', 'max:20480', 'extensions:dll'],
+            'dll_variants' => ['sometimes', 'array', 'max:20'],
+            'dll_variants.*' => ['array:code,name,file,remove'],
+            'dll_variants.*.code' => ['required', 'string', 'max:50', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', 'distinct:strict'],
+            'dll_variants.*.name' => ['required', 'string', 'max:100'],
+            'dll_variants.*.file' => ['nullable', 'file', 'max:20480', 'extensions:dll'],
+            'dll_variants.*.remove' => ['sometimes', 'boolean'],
         ];
     }
 }

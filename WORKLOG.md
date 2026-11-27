@@ -300,3 +300,26 @@ Bagian ini melengkapi riwayat sebelumnya dan menjadi ringkasan keputusan terakhi
 - Deployment/keamanan operasional yang masih perlu dikerjakan atau diverifikasi: TLS dan reverse proxy tepercaya, firewall, hak akses server/database, backup/restore, monitoring/rate limit infrastruktur dan MFA admin. Hardening lokal bukan jaminan bebas celah atau penetration test penuh.
 - Tidak ada data key pengguna atau transaksi riil yang sengaja dihapus/diubah untuk QA. Pruner dry-run terakhir menunjukkan 0 invoice memenuhi syarat. Penghapusan otomatis hanya mengikuti aturan umur/kondisi invoice yang sudah disepakati.
 
+
+## 27 November 2026 — DLL per versi dan kontrak akun client
+
+- Arahan pengguna: satu game memiliki beberapa versi DLL bernama, seperti Infinity/Mirae, masing-masing file sendiri. Versi dapat ditambah pada Konfigurasi Game; aplikasi desktop nantinya mendeteksi launcher dan meminta DLL yang tepat.
+- Migrasi additive menambah games.dll_variants (JSON nullable). Service mengunci game, menyimpan file privat/checksum/ukuran, mengganti dan menghapus file versi tertentu sesudah commit; rollback menjaga file lama. Request edit yang tidak menyertakan versi lain tidak menghapusnya.
+- Form menyediakan Tambah versi game, nama, kode permanen dan upload DLL; versi lama dapat diganti nama/berkas atau ditandai hapus. Maksimal 20 versi, setiap DLL 20 MB. Kolom DLL lama dipertahankan untuk kompatibilitas data.
+- API GET /api/v1/games/dll menerima X-Game-Version. infinity hanya mendapat Infinity; mirae hanya mendapat Mirae. Unknown/missing-file -> 404 release_unavailable; tanpa header pada game bervarian -> 422 game_version_required. Tidak fallback otomatis. Game tanpa varian tetap dapat memakai kontrak lama tanpa header.
+- Request tetap memerlukan Bearer key + X-HWID + X-Game, lisensi aktif/bound dan akses game. Respons binary menambah X-Game-Version dan checksum sesuai rilis. Audit mencatat versi/hash tanpa path privat.
+- Arahan lanjutan pengguna: DLL mengambil data akun (expired, key, nama user, paket). POST validate dan GET status kini menambah account.member_name, key_hint, package snapshot pesanan lunas terakhir dan games. Paket sandbox/pending diabaikan; manual tanpa pesanan null. Key lengkap tidak dikembalikan karena client sudah memilikinya; expired/HWID salah tetap ditolak tanpa data akun.
+- CLIENT_API.md memuat kontrak, error, contoh header, aturan client/DLL, batas kemampuan server dan prosedur update. API console diperbarui. Source/binary injector dan DLL tidak diubah pada tahap server ini.
+- Verifikasi SQLite: 149 tes / 1.147 assertions PASS. Tes awal unduhan/varian: 16 tes / 151 assertions PASS. Vite build dan Blade cache berhasil; Pint targeted berhasil (--dirty tidak tersedia karena folder belum repository Git).
+- Pengguna meminta push ke https://github.com/ksmaajr/KazuhaDev-Ksmarjaa. Repo terverifikasi dapat diakses dan hanya mempunyai README, default main. Pengguna kemudian meminta dari lokal dahulu karena agent masih deploy; PUSH DITAHAN. Belum init Git/commit/push atau mengubah server remote. Siapkan update sebagai commit terpisah setelah baseline deploy jelas; jangan menyatakan git pull tersedia sebelum push selesai.
+- Migrasi kolom dll_variants berhasil diterapkan pada database aplikasi lokal. Tidak menghapus atau mengunggah binary pengguna. Server publik/agent deployment tidak disentuh.
+- Verifikasi MySQL keyforge_test selesai: 149 tes / 1.147 assertions PASS. Suite menggunakan database pengujian terisolasi melalui Test-MySQL.ps1.
+
+### Revisi form DLL — 27 November 2026
+- Pengguna meminta kolom DLL lama / tanpa versi dihapus dari tampilan. Form create/edit kini hanya menawarkan DLL per versi game; kartu game juga tidak lagi menampilkan baris DLL tanpa versi.
+- Data/file DLL lama dan kompatibilitas API tetap dipertahankan; tidak ada penghapusan berkas atau database. Dokumentasi CLIENT_API disesuaikan. Push masih ditahan.
+
+### Persiapan push GitHub atas instruksi terbaru pengguna
+- Pengguna mengizinkan langsung push proyek Laravel terbaru ke repo agar agent dapat pull update.
+- Repository lokal diinisialisasi dan riwayat README remote dipertahankan. Commit cdd8da0 mengimpor baseline persis dari ZIP source awal (dependency, cache runtime, database, .env dan unggahan privat dikecualikan).
+- Update DLL versi, data akun dan dokumentasi disiapkan sebagai commit berikutnya. CLIENT_API memuat instruksi pull serta penanganan server awal berbasis ZIP. Tidak melakukan deploy/server restart atau mengirim pesan ke agent lain.

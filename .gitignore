@@ -26,3 +26,10 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 /.local
+
+# Keep all environment variants and operational credentials private.
+.env.*
+!.env.example
+*.pem
+*.pfx
+*.p12

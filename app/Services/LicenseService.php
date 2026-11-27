@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Game;
 use App\Models\LicenseEvent;
 use App\Models\LicenseKey;
+use App\Models\PurchaseOrder;
 use App\Models\Setting;
 use App\Support\LicenseDuration;
 use Illuminate\Support\Facades\DB;
@@ -36,9 +37,6 @@ class LicenseService
             if ($license->revoked_at) {
                 return $this->deny($license, 'revoked', 403, $ip, $fingerprint);
             }
-            if ($license->expires_at?->lessThanOrEqualTo(now())) {
-                return $this->deny($license, 'expired', 403, $ip, $fingerprint);
-            }
             $game = Game::where('code', $gameCode)->lockForUpdate()->first();
             if (! $game) {
                 return $this->deny($license, 'game_unavailable', 403, $ip, $fingerprint);
@@ -63,13 +61,25 @@ class LicenseService
             } elseif (! hash_equals($license->hwid_hash, $hash)) {
                 return $this->deny($license, 'hwid_mismatch', 403, $ip, $fingerprint);
             }
+            if ($license->expires_at?->lessThanOrEqualTo(now())) {
+                return $this->deny($license, 'expired', 403, $ip, $fingerprint,
+                    $license->hwid_hash !== null ? $this->accountData($license, $game, 'expired') : null);
+            }
             if ($bind) {
                 $license->last_seen_at = now();
                 $license->save();
                 $this->record($license, $newlyBound ? 'activated' : 'validated', $ip, $fingerprint, null, ['game_code' => $game->code]);
             }
 
+            $purchase = PurchaseOrder::where('status', 'paid')
+                ->where(fn ($query) => $query->where('issued_license_id', $license->id)->orWhere('owner_license_id', $license->id))
+                ->where(fn ($query) => $query->whereNull('gateway_mode')->orWhere('gateway_mode', 'production'))
+                ->orderByDesc('paid_at')->orderByDesc('id')->first();
+
             return [200, ['success' => true, 'code' => 'valid', 'message' => $newlyBound ? 'HWID terdaftar. Akses diberikan.' : 'Key dan HWID valid.', 'data' => [
+                'account' => ['member_name' => $license->member_name ?: $license->label, 'key_hint' => $license->key_hint,
+                    'package' => $purchase ? ['name' => $purchase->product_name, 'duration_seconds' => $purchase->duration_seconds ?? $purchase->days * 86400] : null,
+                    'games' => $license->games()->get(['games.code', 'games.name'])->map(fn (Game $accessGame): array => ['code' => $accessGame->code, 'name' => $accessGame->name])->all()],
                 'game' => ['code' => $game->code, 'name' => $game->name], 'license_id' => $license->id, 'label' => $license->label, 'status' => 'active', 'hwid_bound' => true, 'newly_bound' => $newlyBound,
                 'created_at' => $license->created_at->toIso8601String(), 'activated_at' => $license->activated_at?->toIso8601String(),
                 'expires_at' => $license->expires_at->toIso8601String(), 'remaining_seconds' => max(0, $license->expires_at->getTimestamp() - now()->getTimestamp()),
@@ -153,12 +163,31 @@ class LicenseService
         });
     }
 
-    private function deny(?LicenseKey $license, string $code, int $status, ?string $ip, string $fingerprint): array
+    private function accountData(LicenseKey $license, Game $game, string $status): array
+    {
+        $purchase = PurchaseOrder::where('status', 'paid')
+            ->where(fn ($query) => $query->where('issued_license_id', $license->id)->orWhere('owner_license_id', $license->id))
+            ->where(fn ($query) => $query->whereNull('gateway_mode')->orWhere('gateway_mode', 'production'))
+            ->orderByDesc('paid_at')->orderByDesc('id')->first();
+
+        return [
+            'account' => ['member_name' => $license->member_name ?: $license->label, 'key_hint' => $license->key_hint,
+                'package' => $purchase ? ['name' => $purchase->product_name, 'duration_seconds' => $purchase->duration_seconds ?? $purchase->days * 86400] : null,
+                'games' => $license->games()->get(['games.code', 'games.name'])->map(fn (Game $accessGame): array => ['code' => $accessGame->code, 'name' => $accessGame->name])->all()],
+            'game' => ['code' => $game->code, 'name' => $game->name], 'license_id' => $license->id,
+            'label' => $license->label, 'status' => $status, 'hwid_bound' => $license->hwid_hash !== null,
+            'expires_at' => $license->expires_at?->toIso8601String(),
+            'remaining_seconds' => max(0, ($license->expires_at?->getTimestamp() ?? 0) - now()->getTimestamp()),
+            'server_time' => now()->toIso8601String(), 'heartbeat_interval' => (int) Setting::valueFor('heartbeat_interval', '60'),
+        ];
+    }
+
+    private function deny(?LicenseKey $license, string $code, int $status, ?string $ip, string $fingerprint, ?array $data = null): array
     {
         $messages = ['game_unavailable' => 'Kode game tidak dikenal.', 'game_not_allowed' => 'Key tidak memiliki akses ke game ini.', 'invalid_key' => 'Key tidak ditemukan.', 'revoked' => 'Key telah dicabut.', 'expired' => 'Masa berlaku key sudah habis.', 'hwid_mismatch' => 'Key terikat ke perangkat lain.', 'activation_required' => 'Aktivasi melalui POST terlebih dahulu.'];
         $this->record($license, $code, $ip, $fingerprint);
 
-        return [$status, ['success' => false, 'code' => $code, 'message' => $messages[$code], 'data' => null]];
+        return [$status, ['success' => false, 'code' => $code, 'message' => $messages[$code], 'data' => $data]];
     }
 
     private function record(?LicenseKey $license, string $action, ?string $ip, ?string $fingerprint = null, ?int $actorId = null, array $metadata = []): void

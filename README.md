@@ -214,3 +214,11 @@ Unduhan langsung dari website memakai session hasil login key dan diperiksa ulan
 - Polling setiap 10 detik serta ketika tab kembali aktif. Feed member hanya aktivitas key sendiri; feed admin tetap memerlukan role admin.
 - Konten yang berubah disegarkan otomatis. Dialog terbuka, form yang sedang diedit, input berfokus dan teks terseleksi menunda penggantian konten agar pekerjaan pengguna tidak tertimpa.
 - Countdown bergerak setiap detik, kemudian disinkronkan ke waktu server.
+
+## Update DLL per versi dan data akun
+
+Konfigurasi Game kini mendukung beberapa DLL bernama, misalnya Infinity (`infinity`) dan Mirae (`mirae`). Request unduhan memakai `X-Game-Version` untuk memilih tepat satu versi; rilis tidak dikenal tidak dialihkan ke berkas lain. Jika varian sudah dikonfigurasi, client lama tanpa header versi mendapat 422. DLL lama tetap tersimpan untuk migrasi.
+
+POST validate dan GET status menambahkan `data.account` berisi nama member, key tersamarkan, paket dari pesanan lunas terakhir dan seluruh akses game. Key manual tanpa pesanan mempunyai paket null. Data expired/sisa durasi tetap pada field lama. Kontrak lengkap, contoh request, aturan client dan langkah migrasi terdapat di [CLIENT_API.md](CLIENT_API.md).
+
+Implementasi dan binary injector/DLL merupakan tahap terpisah. Perubahan server ini belum memasang heartbeat/IPC/deteksi launcher di binary desktop. Instruksi payment manual pada bagian lama README menggambarkan tahap awal; status SumoPod terbaru dijelaskan pada WORKLOG, dengan Sandbox tetap tidak menerbitkan key/perpanjangan/pendapatan riil.

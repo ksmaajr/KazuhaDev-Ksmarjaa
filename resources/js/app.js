@@ -4,6 +4,7 @@ import './ui-icons';
 import './currency';
 import './controls';
 import './details';
+import './dll-versions';
 import { notify as toast, confirmAction } from './feedback';
 import './live';
 const $=selector=>document.querySelector(selector);

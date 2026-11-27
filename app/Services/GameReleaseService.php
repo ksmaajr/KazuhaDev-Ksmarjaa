@@ -6,6 +6,7 @@ use App\Models\Game;
 use App\Models\LicenseEvent;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class GameReleaseService
@@ -65,7 +66,38 @@ class GameReleaseService
                     }
                 }
                 $locked->save();
-                LicenseEvent::create(['user_id' => $actorId, 'action' => $game ? 'game_updated' : 'game_created', 'ip_address' => $ip, 'metadata' => ['game_id' => $locked->id, 'game_name' => $locked->name, 'game_code' => $locked->code, 'release_version' => $locked->release_version, 'injector_sha256' => $locked->injector_sha256, 'dll_sha256' => $locked->dll_sha256]]);
+                $variants = $locked->dll_variants ?? [];
+                foreach ($data['dll_variants'] ?? [] as $index => $variant) {
+                    $code = $variant['code'];
+                    $existing = $variants[$code] ?? null;
+                    if ($variant['remove'] ?? false) {
+                        if ($existing) {
+                            $oldPaths[] = $existing['path'];
+                            unset($variants[$code]);
+                        }
+
+                        continue;
+                    }
+                    if (isset($variant['file'])) {
+                        $file = $variant['file'];
+                        $path = $file->store('game-builds', 'local');
+                        if (! $path) {
+                            throw new \RuntimeException('Gagal menyimpan DLL versi game.');
+                        }
+                        $newPaths[] = $path;
+                        if ($existing) {
+                            $oldPaths[] = $existing['path'];
+                        }
+                        $variants[$code] = ['code' => $code, 'name' => $variant['name'], 'path' => $path, 'filename' => $locked->code.'-'.$code.'.dll', 'sha256' => hash_file('sha256', $file->getRealPath()), 'size' => $file->getSize()];
+                    } elseif ($existing) {
+                        $variants[$code]['name'] = $variant['name'];
+                    } else {
+                        throw ValidationException::withMessages(['dll_variants.'.$index.'.file' => 'Unggah DLL untuk versi baru ini.']);
+                    }
+                }
+                $locked->dll_variants = $variants;
+                $locked->save();
+                LicenseEvent::create(['user_id' => $actorId, 'action' => $game ? 'game_updated' : 'game_created', 'ip_address' => $ip, 'metadata' => ['game_id' => $locked->id, 'game_name' => $locked->name, 'game_code' => $locked->code, 'release_version' => $locked->release_version, 'injector_sha256' => $locked->injector_sha256, 'dll_sha256' => $locked->dll_sha256, 'dll_variants' => collect($variants)->map(fn (array $variant): array => ['code' => $variant['code'], 'name' => $variant['name'], 'sha256' => $variant['sha256'], 'size' => $variant['size']])->values()->all()]]);
 
                 return $locked;
             });

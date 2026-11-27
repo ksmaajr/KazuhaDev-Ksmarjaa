@@ -25,19 +25,30 @@ class LicenseController extends Controller
     public function dll(Request $request, LicenseService $service): JsonResponse|BinaryFileResponse
     {
         $input = validator(['key' => $request->bearerToken(), 'hwid' => $request->header('X-HWID'), 'game_code' => $request->header('X-Game')], (new ValidateLicenseRequest)->rules())->validate();
+        $version = validator(['version' => $request->header('X-Game-Version')], ['version' => ['nullable', 'string', 'max:50', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/']])->validate()['version'] ?? null;
 
-        return DB::transaction(function () use ($input, $request, $service) {
+        return DB::transaction(function () use ($input, $request, $service, $version) {
             [$status,$result] = $service->check($input['key'], $input['hwid'], false, $request->ip(), $input['game_code']);
             if ($status !== 200) {
                 return response()->json($result, $status)->header('Cache-Control', 'no-store');
             }
             $game = Game::where('code', $input['game_code'])->firstOrFail();
-            if (! $game->dll_path || ! Storage::disk('local')->exists($game->dll_path)) {
+            $variants = $game->dll_variants ?? [];
+            if ($version === null && count($variants) > 0) {
+                return response()->json(['success' => false, 'code' => 'game_version_required', 'message' => 'Kirim kode versi melalui X-Game-Version.', 'data' => null], 422)->header('Cache-Control', 'no-store');
+            }
+            $release = $version !== null ? ($variants[$version] ?? null) : ['path' => $game->dll_path, 'filename' => $game->dll_name, 'sha256' => $game->dll_sha256];
+            if (! $release || ! $release['path'] || ! Storage::disk('local')->exists($release['path'])) {
                 return response()->json(['success' => false, 'code' => 'release_unavailable', 'message' => 'DLL belum tersedia.', 'data' => null], 404);
             }
-            LicenseEvent::create(['license_key_id' => $result['data']['license_id'], 'action' => 'downloaded_dll', 'ip_address' => $request->ip(), 'metadata' => ['game_code' => $game->code, 'game_name' => $game->name, 'sha256' => $game->dll_sha256, 'channel' => 'injector_api']]);
+            LicenseEvent::create(['license_key_id' => $result['data']['license_id'], 'action' => 'downloaded_dll', 'ip_address' => $request->ip(), 'metadata' => ['game_code' => $game->code, 'game_name' => $game->name, 'game_version' => $version, 'sha256' => $release['sha256'], 'channel' => 'injector_api']]);
 
-            return response()->download(Storage::disk('local')->path($game->dll_path), $game->dll_name, ['Content-Type' => 'application/octet-stream', 'X-Content-Type-Options' => 'nosniff', 'Cache-Control' => 'private, no-store', 'X-Checksum-SHA256' => $game->dll_sha256 ?? '']);
+            $headers = ['Content-Type' => 'application/octet-stream', 'X-Content-Type-Options' => 'nosniff', 'Cache-Control' => 'private, no-store', 'X-Checksum-SHA256' => $release['sha256'] ?? ''];
+            if ($version !== null) {
+                $headers['X-Game-Version'] = $version;
+            }
+
+            return response()->download(Storage::disk('local')->path($release['path']), $release['filename'], $headers);
         });
     }
 
