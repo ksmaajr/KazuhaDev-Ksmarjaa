@@ -65,6 +65,20 @@
 :root[data-theme="light"] .member-studio .ms-content .btn:disabled{opacity:.55;cursor:not-allowed}
 :root[data-theme="light"] .member-studio .ms-library .empty-state{background:#292233;border:1px solid #594963;border-radius:18px;color:#f9f3fc;padding:26px;--muted:#d4c5de;--mint:#efb3df}
 :root[data-theme="light"] .member-studio .ms-library .empty-state p{color:#d4c5de}
+
+/* Full-width library empty state and readable typography in both themes. */
+.member-studio .ms-library .page-heading h2{font-size:23px;font-weight:700;letter-spacing:-.03em;margin:6px 0}
+.member-studio .ms-library .game-grid:has(>.ms-library-empty){grid-template-columns:minmax(0,1fr);max-width:none;width:100%;margin:0;padding:0;justify-items:stretch}
+.member-studio .ms-library .ms-library-empty{grid-column:1/-1;width:100%;max-width:none;min-height:150px;box-sizing:border-box;display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:20px;margin:0;padding:24px;border-radius:18px;text-align:left;border:1px solid var(--line);background:radial-gradient(ellipse at 100% 0%,#a77ac315,transparent 65%),var(--panel)}
+.ms-library-symbol{display:grid;place-items:center;flex:none;width:68px;height:68px;border:1px solid var(--line);border-radius:16px;background:var(--soft);color:var(--mint)}
+.ms-library-empty-copy{flex:1;min-width:0;display:grid;gap:7px}
+.ms-library-caption{font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--mint)}
+.member-studio .ms-library .ms-library-empty strong{font-size:20px;font-weight:700;line-height:1.3;color:var(--text);margin:0}
+.member-studio .ms-library .ms-library-empty p{font-size:13px;color:var(--muted);line-height:1.6;max-width:600px;margin:0}
+.ms-library-empty-status{display:flex;align-items:center;gap:7px;flex:none;padding:8px 11px;border:1px solid var(--line);border-radius:8px;background:var(--soft);color:var(--muted);font-size:11px}
+:root[data-theme="light"] .member-studio .ms-library .ms-library-empty{--panel:#292233;--soft:#382e43;--line:#594963;--text:#f9f3fc;--muted:#d4c5de;--mint:#efb3df;background:radial-gradient(ellipse at 100% 0%,#a77ac315,transparent 65%),var(--panel);border-color:var(--line);box-shadow:0 7px 20px #30213d16}
+:root[data-theme="light"] .member-studio .ms-library .ms-library-empty strong{color:#f9f3fc}
+@media(max-width:650px){.member-studio .ms-library .ms-library-empty{flex-wrap:wrap;gap:12px;padding:18px}.ms-library-symbol{width:48px;height:48px}.ms-library-empty-copy{flex:1 1 180px}.ms-library-empty-status{margin-left:60px}.member-studio .ms-library .ms-library-empty strong{font-size:17px}}
 </style><style>
 body.member-with-sidebar{font-family:'Manrope','Plus Jakarta Sans','Segoe UI Variable','Segoe UI',system-ui,sans-serif}
 .member-with-sidebar .member-app-shell .member-header{background:var(--panel);border-bottom:1px solid var(--line);box-shadow:0 3px 18px #0000000b}
@@ -96,6 +110,6 @@ body.member-with-sidebar{font-family:'Manrope','Plus Jakarta Sans','Segoe UI Var
 @if(!in_array($license->status(),['expired','revoked']) && $game->injector_path)<a class="btn primary full" href="{{ route('member.games.download',[$game,'injector']) }}"><x-icon name="download" size="18"/> Unduh Injector <x-icon name="arrow" size="16"/></a><details class="checksum"><summary>Verifikasi SHA-256 injector</summary><code>{{ $game->injector_sha256 }}</code></details>
 @elseif(in_array($license->status(),['expired','revoked']))<button class="btn secondary full" disabled><x-icon name="lock" size="16"/> Perpanjang key untuk mengunduh</button>
 @else<button class="btn secondary full" disabled>Injector sedang disiapkan</button>@endif
-<div class="game-card-foot"><x-icon name="lock" size="12"/> Unduhan khusus pemilik key</div></div></article>@empty<div class="empty-state"><x-icon name="gamepad" size="38"/><strong>Library Anda menunggu.</strong><p>Hubungi admin untuk menambahkan akses game.</p></div>@endforelse</div></section>
+<div class="game-card-foot"><x-icon name="lock" size="12"/> Unduhan khusus pemilik key</div></div></article>@empty<div class="empty-state ms-library-empty"><span class="ms-library-symbol"><x-icon name="gamepad" size="32"/></span><div class="ms-library-empty-copy"><span class="ms-library-caption">GAME LIBRARY / 00</span><strong>Belum ada akses game</strong><p>Game yang terdaftar pada lisensi Anda akan muncul di sini. Hubungi admin jika akses belum tersedia.</p></div><span class="ms-library-empty-status"><x-icon name="info" size="15"/> Belum tersedia</span></div>@endforelse</div></section>
 </div><footer class="footer ms-footer"><span>© {{ now()->year }} KazuhaDev. · Member portal</span><span><span class="status-dot"></span> Server time <time id="server-clock" data-time="{{ now()->toIso8601String() }}">{{ now()->timezone('Asia/Jakarta')->format('H:i:s') }}</time> WIB</span></footer>
 </main></div><x-feedback/></body></html>
