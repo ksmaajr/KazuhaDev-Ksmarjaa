@@ -51,6 +51,17 @@
 @media(max-width:1050px){.ms-overview-grid{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:700px){.member-studio .member-grid{grid-template-columns:minmax(0,1fr)}.member-studio .ms-content{gap:14px}.member-studio .ms-welcome{flex-wrap:wrap;gap:12px}.member-studio .member-countdown{padding:10px 14px 16px;gap:5px}.member-studio .member-countdown>div{padding:10px 2px}.member-studio .duration-panel .panel-heading,.member-studio .duration-meta{padding-inline:14px}}
 @media(prefers-reduced-motion:reduce){.member-studio .ms-content>*{animation:none!important}.member-studio .ms-library .game-card:hover{transform:none}}
+</style><style>
+body.member-with-sidebar{font-family:'Manrope','Plus Jakarta Sans','Segoe UI Variable','Segoe UI',system-ui,sans-serif}
+.member-with-sidebar .member-app-shell .member-header{background:var(--panel);border-bottom:1px solid var(--line);box-shadow:0 3px 18px #0000000b}
+.member-with-sidebar .member-header .breadcrumbs{font-weight:500;min-width:0}
+.member-with-sidebar .member-header .breadcrumbs strong{font-weight:700}
+.member-with-sidebar .member-header-actions .btn{min-height:36px;border-radius:9px}
+.member-with-sidebar .member-header-actions>a.btn{background:var(--mint-bg);color:var(--mint);border-color:var(--line)}
+.member-with-sidebar .member-header-actions>a.btn:hover{border-color:var(--mint)}
+.member-with-sidebar .member-main .ms-footer{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-top:24px;padding:16px 20px;border:1px solid #574461;border-radius:13px;background:linear-gradient(115deg,#201b29,#35283e);color:#e3d3ec;font-size:12px}
+:root[data-theme="light"] .member-with-sidebar .member-app-shell .member-header{background:#fff;border-color:#cbbfd3}
+@media(max-width:650px){.member-with-sidebar .member-app-shell .member-header{height:auto;min-height:68px;padding-block:10px;gap:7px;flex-wrap:wrap}.member-with-sidebar .member-header-actions{gap:5px}.member-with-sidebar .member-main .ms-footer{padding:12px}}
 </style></head>
 <body class="member-body member-with-sidebar member-studio" data-sidebar-scope="member" data-feed-url="{{ route('notifications.member',absolute:false) }}">
 <x-member-sidebar :license="$license"/><div class="app-shell member-app-shell"><header class="member-header"><button class="icon-btn sidebar-toggle" type="button" id="menu-toggle" aria-label="Buka menu" aria-controls="sidebar" aria-expanded="false"><x-icon name="menu" size="20"/></button><div class="breadcrumbs">Member portal <x-icon name="chevron" size="13"/><strong>Dashboard saya</strong></div><div class="member-header-actions"><a class="btn secondary compact" href="{{ route('member.renew') }}"><x-icon name="clock" size="15"/> Perpanjang</a><x-notification-bell/><x-theme-toggle/><form method="post" action="{{ route('member.logout') }}">@csrf<button class="btn secondary compact" type="submit"><x-icon name="logout" size="15"/> Keluar</button></form></div></header>
