@@ -10,19 +10,20 @@
 </head>
 <body data-sidebar-scope="admin" data-feed-url="{{ route('notifications.admin',absolute:false) }}">
 <a href="#main" class="skip-link">Lewati navigasi</a>
-<button class="sidebar-backdrop" type="button" data-sidebar-backdrop aria-label="Tutup navigasi" tabindex="-1" hidden></button><aside class="sidebar" id="sidebar">
-<a class="brand" href="{{ route('dashboard') }}"><span class="brand-mark"><x-icon name="sparkles" size="23"/></span><span>KazuhaDev<span class="brand-dot">.</span></span><span class="version">PRO</span></a>
-<div class="workspace"><span class="workspace-avatar">K</span><div><strong>License workspace</strong><small>Personal server</small></div><span class="status-dot"></span></div>
+<button class="sidebar-backdrop" type="button" data-sidebar-backdrop aria-label="Tutup navigasi" tabindex="-1" hidden></button><aside class="sidebar admin-sidebar" id="sidebar" aria-label="Navigasi administrator" data-no-ui-icon>
+<a class="brand" href="{{ route('dashboard') }}"><span class="brand-mark admin-brand-mark" aria-hidden="true">KZ</span><span>KazuhaDev<span class="brand-dot">.</span></span><span class="version">PRO</span></a>
+<div class="workspace"><span class="workspace-avatar"><x-icon name="shield" size="18"/></span><div><strong>License workspace</strong><small>{{ app()->environment('local') ? 'Local environment' : 'Server environment' }}</small></div><span class="admin-workspace-tag">ADMIN</span></div>
 <button type="button" class="icon-btn sidebar-close" data-sidebar-close aria-label="Tutup sidebar"><x-icon name="close" size="17"/></button>
-<nav aria-label="Menu utama"><a href="{{ route('dashboard') }}" class="nav-item {{ request()->routeIs('dashboard')?'selected':'' }}"><x-icon name="grid" size="18"/><span>Overview</span></a>
+<nav aria-label="Menu utama"><div class="nav-caption">WORKSPACE</div><a href="{{ route('dashboard') }}" class="nav-item {{ request()->routeIs('dashboard')?'selected':'' }}"><x-icon name="grid" size="18"/><span>Overview</span></a>
 <x-sidebar-group id="licenses" title="Lisensi" icon="key" :items="[['licenses','key','License keys'],['activity','activity','Riwayat aktivitas']]"/>
 <x-sidebar-group id="sales" title="Penjualan & pembayaran" icon="shopping" :items="[['orders.index','receipt','Pesanan lisensi'],['products.index','package','Paket lisensi'],['finance.index','wallet','Keuangan & laporan']]"/>
 <x-sidebar-group id="integration" title="Integrasi & game" icon="code" :items="[['games.index','gamepad','Konfigurasi game'],['api.console','code','API console']]"/>
+<div class="nav-caption">SYSTEM</div>
 <x-sidebar-group id="settings" title="Pengaturan" icon="settings" :items="[['settings','settings','Pengaturan API'],['payments.settings','wallet','Payment gateway']]"/>
 <x-sidebar-group id="administration" title="Administrasi" icon="shield" :items="[['admins.index','users','Kelola administrator']]"/>
 <div class="nav-caption">PORTAL</div><a href="{{ route('member.login') }}" class="nav-item"><x-icon name="device" size="18"/><span>Portal member</span><x-icon name="arrow" size="13"/></a><a href="{{ route('shop') }}" class="nav-item"><x-icon name="shopping" size="18"/><span>Toko publik</span><x-icon name="arrow" size="13"/></a></nav>
 <div class="sidebar-bottom">
-<div class="profile"><div class="avatar">{{ strtoupper(substr(auth()->user()->name,0,1)) }}</div><div><strong>{{ auth()->user()->name }}</strong><small>Workspace administrator</small></div><form action="{{ route('logout') }}" method="post">@csrf<button class="icon-btn" title="Keluar" aria-label="Keluar"><x-icon name="logout" size="18"/></button></form></div>
+<div class="profile"><div class="avatar">{{ strtoupper(substr(auth()->user()->name,0,1)) }}</div><div><strong>{{ auth()->user()->name }}</strong><small>Administrator</small></div><form action="{{ route('logout') }}" method="post">@csrf<button class="icon-btn" title="Keluar dari workspace" aria-label="Keluar dari workspace"><x-icon name="logout" size="18"/></button></form></div>
 </div>
 </aside>
 <div class="app-shell">
