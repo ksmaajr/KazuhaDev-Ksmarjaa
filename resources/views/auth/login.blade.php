@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="robots" content="noindex,nofollow">
     <title>Masuk · KazuhaDev.</title>
-    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ asset('kz-brand.webp') }}" type="image/webp">
     <x-theme-head/>
     @vite(['resources/css/app.css','resources/js/app.js'])
 </head>
 <body class="kz-auth">
     <main class="kz-auth-shell" data-no-ui-icon>
         <section class="kz-auth-editorial" aria-labelledby="auth-heading">
-            <div class="kz-auth-brand"><a href="{{ route('home') }}" class="kz-auth-wordmark" aria-label="KazuhaDev, beranda"><span class="kz-auth-monogram">KZ</span><span>KazuhaDev<span class="kz-auth-period">.</span></span></a><span class="kz-auth-edition">ADMIN / 01</span></div>
+            <div class="kz-auth-brand"><a href="{{ route('home') }}" class="kz-auth-wordmark" aria-label="KazuhaDev, beranda"><img class="kz-auth-monogram kz-brand-image" src="{{ asset('kz-brand.webp') }}" width="42" height="42" alt=""><span>KazuhaDev<span class="kz-auth-period">.</span></span></a><span class="kz-auth-edition">ADMIN / 01</span></div>
             <div class="kz-auth-story">
                 <span class="kz-auth-kicker"><span></span> LICENSE MANAGEMENT</span>
                 <h1 id="auth-heading">Kendali penuh.<br><em>Akses terjaga.</em></h1>
@@ -33,7 +33,7 @@
         </section>
         <section class="kz-auth-panel" aria-labelledby="login-heading">
             <header class="kz-auth-panel-head">
-                <a class="kz-auth-mobile-brand kz-auth-wordmark" href="{{ route('home') }}"><span class="kz-auth-monogram">KZ</span>KazuhaDev.</a>
+                <a class="kz-auth-mobile-brand kz-auth-wordmark" href="{{ route('home') }}"><img class="kz-auth-monogram kz-brand-image" src="{{ asset('kz-brand.webp') }}" width="42" height="42" alt="">KazuhaDev.</a>
                 <span class="kz-auth-breadcrumb">Workspace <span>/</span> Administrator</span>
                 <x-theme-toggle/>
             </header>

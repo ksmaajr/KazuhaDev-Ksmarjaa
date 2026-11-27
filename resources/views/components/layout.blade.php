@@ -5,13 +5,13 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="csrf-token" content="{{ csrf_token() }}"><meta name="robots" content="noindex,nofollow">
 <title>{{ $title }} · KazuhaDev.</title>
-<link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+<link rel="icon" href="{{ asset('kz-brand.webp') }}" type="image/webp">
 <x-theme-head/>@vite(['resources/css/app.css','resources/js/app.js'])
 </head>
 <body data-sidebar-scope="admin" data-feed-url="{{ route('notifications.admin',absolute:false) }}">
 <a href="#main" class="skip-link">Lewati navigasi</a>
 <button class="sidebar-backdrop" type="button" data-sidebar-backdrop aria-label="Tutup navigasi" tabindex="-1" hidden></button><aside class="sidebar admin-sidebar" id="sidebar" aria-label="Navigasi administrator" data-no-ui-icon>
-<a class="brand" href="{{ route('dashboard') }}"><span class="brand-mark admin-brand-mark" aria-hidden="true">KZ</span><span>KazuhaDev<span class="brand-dot">.</span></span><span class="version">PRO</span></a>
+<a class="brand" href="{{ route('dashboard') }}"><img class="brand-mark admin-brand-mark kz-brand-image" src="{{ asset('kz-brand.webp') }}" width="35" height="35" alt=""><span>KazuhaDev<span class="brand-dot">.</span></span><span class="version">PRO</span></a>
 <div class="workspace"><span class="workspace-avatar"><x-icon name="shield" size="18"/></span><div><strong>License workspace</strong><small>{{ app()->environment('local') ? 'Local environment' : 'Server environment' }}</small></div><span class="admin-workspace-tag">ADMIN</span></div>
 <button type="button" class="icon-btn sidebar-close" data-sidebar-close aria-label="Tutup sidebar"><x-icon name="close" size="17"/></button>
 <nav aria-label="Menu utama"><div class="nav-caption">WORKSPACE</div><a href="{{ route('dashboard') }}" class="nav-item {{ request()->routeIs('dashboard')?'selected':'' }}"><x-icon name="grid" size="18"/><span>Overview</span></a>
