@@ -51,6 +51,9 @@ class LicenseService
             if (! $license) {
                 return $this->deny(null, 'invalid_key', 401, $ip, $fingerprint);
             }
+            if (PurchaseOrder::where('issued_license_id', $license->id)->where('gateway_mode', 'sandbox')->exists()) {
+                return $this->deny($license, 'game_not_allowed', 403, $ip, $fingerprint);
+            }
             if ($license->revoked_at) {
                 return $this->deny($license, 'revoked', 403, $ip, $fingerprint);
             }
