@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\MemberLoginRequest;
+use App\Models\Game;
 use App\Models\LicenseKey;
 use App\Models\LicenseProduct;
 use App\Models\PurchaseOrder;
@@ -38,9 +39,11 @@ class MemberController extends Controller
 
         $license->load('games');
         $renewalProducts = LicenseProduct::where('is_active', true)->orderBy('price')->get();
+        $renewalGameIds = $renewalProducts->flatMap(fn ($product) => $product->game_ids ?? [])->unique()->values();
+        $renewalGames = Game::whereIn('id', $renewalGameIds)->get()->keyBy('id');
         $renewalInvoices = PurchaseOrder::where('owner_license_id', $license->id)->where('purpose', 'renewal')->where('status', 'pending')->orderByDesc('id')->get();
 
-        return view('member.dashboard', ['license' => $license, 'renewalUrl' => Setting::renewalUrl($license), 'renewalProducts' => $renewalProducts, 'renewalInvoices' => $renewalInvoices]);
+        return view('member.dashboard', ['license' => $license, 'renewalUrl' => Setting::renewalUrl($license), 'renewalProducts' => $renewalProducts, 'renewalGames' => $renewalGames, 'renewalInvoices' => $renewalInvoices]);
     }
 
     public function status(Request $request): JsonResponse
