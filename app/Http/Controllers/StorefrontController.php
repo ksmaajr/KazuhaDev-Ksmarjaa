@@ -39,8 +39,7 @@ class StorefrontController extends Controller
     public function renew(Request $request): View
     {
         $license = $request->attributes->get('member_license');
-        $access = $license->games->pluck('id')->map(fn ($id) => (int) $id)->sort()->values()->all();
-        $items = LicenseProduct::where('is_active', true)->orderBy('price')->get()->filter(fn ($product) => collect($product->game_ids)->map(fn ($id) => (int) $id)->sort()->values()->all() === $access)->values();
+        $items = LicenseProduct::where('is_active', true)->orderBy('price')->get();
         $page = Paginator::resolveCurrentPage();
         $products = new LengthAwarePaginator($items->forPage($page, 8)->values(), $items->count(), 8, $page, ['path' => $request->url()]);
 
