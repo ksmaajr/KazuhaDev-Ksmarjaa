@@ -141,6 +141,28 @@ class PaymentSafetyTest extends TestCase
         $this->assertSame('invoice-once', $order->fresh()->gateway_payment_id);
     }
 
+    public function test_invoice_accepts_normalized_sumopod_https_link_but_rejects_foreign_host(): void
+    {
+        $this->configure('sandbox');
+        $url = '';
+        $order = null;
+        Http::fake(['api-pay-sandbox.sumopod.com/*' => function () use (&$url, &$order) {
+            return Http::response(['payment_id' => 'payment-'.$order->id, 'order_id' => $order->number, 'amount' => $order->amount, 'payment_link_url' => $url], 201);
+        }]);
+        foreach ([' //PAY-SANDBOX.SUMOPOD.COM/pay/test ' => true, 'https://sumopod.com.evil.example/pay/test' => false, 'http://pay-sandbox.sumopod.com/pay/test' => false] as $url => $valid) {
+            $order = PurchaseOrder::factory()->create();
+            try {
+                app(SumoPodService::class)->createLink($order);
+                $this->assertTrue($valid);
+                $this->assertSame('https://PAY-SANDBOX.SUMOPOD.COM/pay/test', $order->fresh()->gateway_payment_url);
+            } catch (ValidationException) {
+                $this->assertFalse($valid);
+                $this->assertSame('uncertain', $order->fresh()->gateway_status);
+                $this->assertNull($order->fresh()->gateway_payment_url);
+            }
+        }
+    }
+
     public function test_timeout_blocks_new_invoice_and_later_valid_callback_can_reconcile(): void
     {
         $this->configure();
