@@ -22,6 +22,9 @@ class StorefrontController extends Controller
 {
     public function index(Request $request): View
     {
+        if (! $request->session()->has('checkout_secret')) {
+            $request->session()->put('checkout_secret', Str::random(64));
+        }
         $filters = ListFilters::read($request, ['game' => ['nullable', 'integer', 'exists:games,id']]);
         $query = LicenseProduct::where('is_active', true);
         ListFilters::search($query, $filters, ['name', 'description']);
@@ -30,7 +33,7 @@ class StorefrontController extends Controller
         }
         ListFilters::sort($query, $filters, 'name', 'price');
 
-        return view('storefront', ['products' => $query->paginate($filters['per_page'] ?? 8)->withQueryString(), 'games' => Game::all()->keyBy('id'), 'renewal' => false, 'license' => null, 'gatewayReady' => PaymentSettings::ready(), 'gatewayMode' => PaymentSettings::mode()]);
+        return view('storefront', ['products' => $query->paginate($filters['per_page'] ?? 8)->withQueryString(), 'games' => Game::all()->keyBy('id'), 'renewal' => false, 'license' => null, 'pendingInvoices' => $this->pendingInvoices($request, 'purchase'), 'gatewayReady' => PaymentSettings::ready(), 'gatewayMode' => PaymentSettings::mode()]);
     }
 
     public function renew(Request $request): View
@@ -41,11 +44,15 @@ class StorefrontController extends Controller
         $page = Paginator::resolveCurrentPage();
         $products = new LengthAwarePaginator($items->forPage($page, 8)->values(), $items->count(), 8, $page, ['path' => $request->url()]);
 
-        return view('storefront', ['products' => $products, 'games' => Game::all()->keyBy('id'), 'renewal' => true, 'license' => $license, 'gatewayReady' => PaymentSettings::ready(), 'gatewayMode' => PaymentSettings::mode()]);
+        return view('storefront', ['products' => $products, 'games' => Game::all()->keyBy('id'), 'renewal' => true, 'license' => $license, 'pendingInvoices' => $this->pendingInvoices($request, 'renewal'), 'gatewayReady' => PaymentSettings::ready(), 'gatewayMode' => PaymentSettings::mode()]);
     }
 
     public function checkout(Request $request, PurchaseService $service): RedirectResponse
     {
+        $productId = $request->validate(['product_id' => ['required', 'integer']])['product_id'];
+        if ($pending = $this->pendingInvoices($request, 'purchase')->firstWhere('license_product_id', (int) $productId)) {
+            return redirect()->route('checkout.receipt', ['order' => $pending->number]);
+        }
         $data = $request->validate(['product_id' => ['required', 'integer', 'exists:license_products,id'], 'idempotency_key' => ['required', 'uuid'], 'member_name' => ['required', 'string', 'max:100'], 'customer_contact' => ['required', 'string', 'max:100'], 'customer_email' => ['nullable', 'email', 'max:255']]);
         if (! $request->session()->has('checkout_secret')) {
             $request->session()->put('checkout_secret', Str::random(64));
@@ -65,10 +72,36 @@ class StorefrontController extends Controller
 
     public function renewOrder(Request $request, PurchaseService $service): RedirectResponse
     {
+        $productId = $request->validate(['product_id' => ['required', 'integer']])['product_id'];
+        if ($pending = $this->pendingInvoices($request, 'renewal')->firstWhere('license_product_id', (int) $productId)) {
+            return redirect()->route('checkout.receipt', ['order' => $pending->number]);
+        }
         $data = $request->validate(['product_id' => ['required', 'integer', 'exists:license_products,id'], 'idempotency_key' => ['required', 'uuid']]);
         $order = $service->order($request->attributes->get('member_license'), (int) $data['product_id'], $data['idempotency_key'], $request->ip(), true);
 
         return redirect()->route('checkout.receipt', ['order' => $order->number]);
+    }
+
+    private function pendingInvoices(Request $request, string $purpose): \Illuminate\Support\Collection
+    {
+        $guest = $request->session()->get('checkout_secret');
+        $member = LicenseKey::find($request->session()->get('member_license_id'));
+        $member = $member && ! $member->revoked_at ? $member : null;
+        if (! $guest && ! $member) {
+            return collect();
+        }
+        return PurchaseOrder::where('status', 'pending')->where('purpose', $purpose)
+            ->where(function ($query) use ($guest, $member, $purpose): void {
+                if ($guest && $purpose === 'purchase') {
+                    $query->where('guest_token_hash', hash('sha256', $guest));
+                }
+                if ($member) {
+                    $query->orWhere('owner_license_id', $member->id);
+                }
+                if (!$member && $purpose !== 'purchase') {
+                    $query->whereRaw('1 = 0');
+                }
+            })->orderByDesc('id')->get();
     }
 
     private function canAccessOrder(Request $request, PurchaseOrder $order): bool
