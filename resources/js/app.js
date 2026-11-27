@@ -267,3 +267,53 @@ document.addEventListener('click', event => {
 });
 document.addEventListener('live:updated', initializeLicenseCreation);
 initializeLicenseCreation();
+
+// Package cards keep the native select as the single submitted value.
+const initializedPackageBrowsers = new WeakSet();
+function refreshPackageArrows(browser) {
+    const track = browser.querySelector('[data-lk-track]');
+    const prev = browser.querySelector('[data-lk-scroll="-1"]');
+    const next = browser.querySelector('[data-lk-scroll="1"]');
+    prev.disabled = track.scrollLeft <= 2;
+    next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
+}
+function syncPackageCards(browser) {
+    const select = browser.querySelector('[data-license-product]');
+    browser.querySelectorAll('[data-lk-option]').forEach(card => card.setAttribute('aria-pressed', String(card.dataset.lkOption === select.value)));
+    browser.querySelector('[data-lk-current]').textContent = select.selectedOptions[0]?.textContent.trim() || 'Custom / tanpa paket';
+}
+function initializePackageBrowsers() {
+    document.querySelectorAll('[data-lk-browser]').forEach(browser => {
+        if (initializedPackageBrowsers.has(browser)) return;
+        initializedPackageBrowsers.add(browser);
+        const select = browser.querySelector('[data-license-product]');
+        const track = browser.querySelector('[data-lk-track]');
+        const details = browser.querySelector('[data-lk-package-details]');
+        browser.classList.add('is-enhanced');
+        select.addEventListener('change', () => syncPackageCards(browser));
+        track.addEventListener('scroll', () => refreshPackageArrows(browser), {passive:true});
+        details.addEventListener('toggle', () => {
+            if (details.open) requestAnimationFrame(() => {
+                const card = track.querySelector('[aria-pressed="true"]');
+                if (card) track.scrollLeft = card.offsetLeft - track.offsetLeft;
+                refreshPackageArrows(browser);
+            });
+        });
+        browser.addEventListener('click', event => {
+            const card = event.target.closest('[data-lk-option]');
+            const arrow = event.target.closest('[data-lk-scroll]');
+            if (card) {
+                select.value = card.dataset.lkOption;
+                select.dispatchEvent(new Event('change', {bubbles:true}));
+            }
+            if (arrow) {
+                const width = track.querySelector('[data-lk-option]')?.offsetWidth || 170;
+                track.scrollBy({left:Number(arrow.dataset.lkScroll)*(width+10),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+            }
+        });
+        syncPackageCards(browser);
+    });
+}
+window.addEventListener('resize', () => document.querySelectorAll('[data-lk-browser]').forEach(refreshPackageArrows));
+document.addEventListener('live:updated', initializePackageBrowsers);
+initializePackageBrowsers();

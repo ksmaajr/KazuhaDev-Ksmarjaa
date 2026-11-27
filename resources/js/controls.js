@@ -1,7 +1,7 @@
 const controllers=new WeakMap();
 let opened=null,sequence=0;
 function enhance(select){
- if(controllers.has(select)||select.multiple||select.size>1)return;
+ if(controllers.has(select)||select.hasAttribute('data-native-select')||select.multiple||select.size>1)return;
  const wrapper=document.createElement('div');wrapper.className='custom-select';select.before(wrapper);wrapper.append(select);select.classList.add('native-select');select.tabIndex=-1;select.setAttribute('aria-hidden','true');
  const trigger=document.createElement('button');trigger.type='button';trigger.className='select-trigger';trigger.setAttribute('role','combobox');trigger.setAttribute('aria-haspopup','listbox');trigger.setAttribute('aria-expanded','false');
  const label=document.createElement('span'),chevron=document.createElement('span');chevron.className='select-chevron';chevron.innerHTML='<svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6"><path d="m5 7 5 5 5-5"/></svg>';trigger.append(label,chevron);wrapper.append(trigger);
