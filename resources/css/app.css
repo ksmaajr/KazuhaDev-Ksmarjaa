@@ -625,3 +625,12 @@ body{font-size:15px}.page-heading p,.panel-heading p{line-height:1.85}.btn{min-h
 .pk-editor .pk-editor-review{margin:16px 0 20px;padding:14px;border:1px solid var(--line);border-radius:12px;background:linear-gradient(120deg,var(--soft),var(--panel))}
 .pk-review-heading{display:flex;align-items:center;gap:10px}.pk-review-heading small,.pk-review-heading strong{display:block;overflow-wrap:anywhere}.pk-review-heading small{font-size:10px;color:var(--mint);letter-spacing:1px}.pk-review-heading strong{font-size:15px;margin-top:4px}
 .pk-editor-review .lk-review{background:var(--panel);margin:12px 0 8px}.pk-editor-review .field-help{margin:0}
+
+/* Catalog detail follows the same visual system as license records. */
+.package-insight .detail-fact-card[data-insight-tone="money"]>.insight-symbol{color:#9fcab4;background:#9fcab414;border-color:#9fcab433}
+:root[data-theme=light] .package-insight .detail-fact-card[data-insight-tone="money"]>.insight-symbol{color:#346f50}
+.package-insight .detail-fact-card[data-insight-tone="shield"]>.insight-symbol{color:var(--mint)}
+.package-insight .detail-facts strong{font-size:14px}
+.package-insight .detail-fact-card[data-insight-tone="money"] strong{font-size:19px;letter-spacing:-.04em}
+.package-insight .detail-fact-card[data-insight-tone="device"] strong{font-size:12px}
+.package-insight .license-detail-field.wide{padding-block:15px}
