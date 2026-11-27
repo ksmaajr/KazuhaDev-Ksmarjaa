@@ -72,6 +72,7 @@ class PaymentSafetyTest extends TestCase
         $this->assertDatabaseCount('license_keys', $keys + 1);
         $this->assertDatabaseCount('financial_transactions', 1);
         $this->assertSame(9300, $order->issuedLicense->duration_seconds);
+        $this->assertEqualsCanonicalizing($order->game_ids, $order->issuedLicense->games->modelKeys());
         $ledger = FinancialTransaction::firstOrFail();
         $this->assertSame(650, $ledger->fee);
         $this->assertSame($order->amount, $ledger->amount);
@@ -125,7 +126,13 @@ class PaymentSafetyTest extends TestCase
         $this->assertSame('paid', $order->fresh()->status);
         $this->assertNotNull($order->fresh()->issued_license_id);
         $this->assertDatabaseCount('license_keys', $keys + 1);
-        $this->assertSame(0, $order->fresh()->issuedLicense->games()->count());
+        $demo = $order->fresh()->issuedLicense;
+        $this->assertEqualsCanonicalizing($order->game_ids, $demo->games->modelKeys());
+        $this->withSession(['member_license_id' => $demo->id])->get(route('member.dashboard'))->assertOk()->assertSee('Demo · unduhan produksi tidak tersedia');
+        foreach ($demo->games as $game) {
+            $this->get(route('member.games.download', [$game, 'injector']))->assertForbidden();
+            $this->postJson('/api/v1/licenses/validate', ['key' => $demo->key_value, 'hwid' => 'DEMO-DEVICE-001', 'game_code' => $game->code])->assertForbidden();
+        }
         $this->assertDatabaseCount('financial_transactions', 0);
     }
 
