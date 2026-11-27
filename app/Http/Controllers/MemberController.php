@@ -77,9 +77,12 @@ class MemberController extends Controller
 
     public function logout(Request $request): RedirectResponse
     {
-        $request->session()->forget('member_license_id');
+        // Remove member identity and checkout credentials, without logging out an admin.
+        $request->session()->forget(['member_license_id', 'checkout_secret', 'payment_return_order']);
         $request->session()->regenerate(true);
 
-        return redirect()->route('member.login');
+        return redirect()->route('member.login', [], 303)
+            ->with('success', 'Anda berhasil keluar dari portal member.')
+            ->header('Cache-Control', 'private, no-store');
     }
 }
