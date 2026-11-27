@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Game;
 use App\Models\LicenseEvent;
 use App\Models\LicenseKey;
+use App\Models\LicenseProduct;
 use App\Models\Setting;
 use App\Services\FinanceReportService;
 use App\Support\ListFilters;
@@ -42,6 +43,7 @@ class DashboardController extends Controller
         return view('dashboard', [
             'sales' => $request->routeIs('licenses') ? null : app(\App\Services\SalesOverviewService::class)->report(),
             'games' => Game::orderBy('name')->get(),
+            'products' => LicenseProduct::where('is_active', true)->orderBy('name')->get(),
             'finance' => app(FinanceReportService::class)->report(now('Asia/Jakarta')->startOfMonth()->toDateString(), now('Asia/Jakarta')->toDateString()),
             'licenses' => $query->paginate($filters['per_page'] ?? 8)->withQueryString(),
             'counts' => ['total' => LicenseKey::count(), 'active' => LicenseKey::whereNull('revoked_at')->where('expires_at', '>', now())->whereNotNull('hwid_hash')->count(), 'unbound' => LicenseKey::whereNull('revoked_at')->whereNull('hwid_hash')->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))->count(), 'expired' => LicenseKey::whereNull('revoked_at')->where('expires_at', '<=', now())->count()],

@@ -57,6 +57,6 @@ $points=fn($field)=>$chart->map(fn($item,$i)=>(45+$i*95).','.round(150-($item[$f
 </tbody></table></div><div class="table-footer"><span>{{ $licenses->total() ? $licenses->firstItem().'–'.$licenses->lastItem().' dari '.$licenses->total().' keys' : '0 license keys' }}</span><div class="pagination">@if($licenses->previousPageUrl())<a class="btn secondary compact" href="{{ $licenses->previousPageUrl() }}">Sebelumnya</a>@endif<span>{{ $licenses->currentPage() }} / {{ max(1,$licenses->lastPage()) }}</span>@if($licenses->nextPageUrl())<a class="btn secondary compact" href="{{ $licenses->nextPageUrl() }}">Berikutnya</a>@endif</div></div></section>
 @if(!$isLicenses)<section class="panel activity-panel"><div class="panel-heading"><div><h2>Aktivitas terbaru</h2><p>Jejak akses dan perubahan lisensi.</p></div><a class="text-link" href="{{ route('activity') }}">Semua aktivitas <x-icon name="arrow" size="15"/></a></div>@forelse($events as $event)<x-event :event="$event"/>@empty<div class="empty-inline">Belum ada aktivitas. Aktivitas akan muncul setelah key dibuat atau API dipanggil.</div>@endforelse</section>@endif
 @unless($isLicenses)</div>@endunless
-<x-create-key :games="$games"/>@foreach($licenses as $license)<x-license-dialogs :license="$license" :games="$games"/>@endforeach
+<x-create-key :games="$games" :products="$products"/>@foreach($licenses as $license)<x-license-dialogs :license="$license" :games="$games"/>@endforeach
 
 </x-layout>
