@@ -73,4 +73,38 @@
 :root[data-theme="light"] .storefront-body .store-redesign .store-pending-live{background:linear-gradient(115deg,#fff,#f4e5f3);border-color:#b579ad;border-left-color:#9d3479}
 :root[data-theme="light"] .storefront-body .store-redesign .store-pending-live:before{background:linear-gradient(110deg,transparent 22%,#b64e9b25 48%,transparent 72%)}
 @media(max-width:760px){.storefront-body .store-header-v2{display:flex;flex-wrap:wrap;padding:12px 14px;gap:12px}}
-</style></head><body class="member-body storefront-body"><header class="member-header store-header-v2"><a class="brand" href="{{ route('home') }}"><img class="brand-mark admin-brand-mark kz-brand-image" src="{{ asset('kz-brand.webp') }}" width="44" height="44" alt=""><span class="store-brand-copy"><strong>KazuhaDev<span class="brand-dot">.</span></strong><small>LICENSE STORE</small></span></a><nav class="store-header-nav" aria-label="Navigasi toko"><a href="{{ route('shop') }}" @if(request()->routeIs('home','shop')) aria-current="page" @endif><x-icon name="package" size="16"/> Katalog lisensi</a></nav><div class="member-header-actions"><a class="btn primary compact store-member-cta" href="{{ $license ? route('member.dashboard') : route('member.login') }}"><x-icon name="user" size="16"/> {{ $license?'Dashboard member':'Masuk member' }} <x-icon name="arrow" size="14"/></a><x-theme-toggle/></div></header><main class="storefront-main"><x-flash-messages/><div data-live-content>{{ $slot }}</div><footer class="footer"><span>© {{ now()->year }} KazuhaDev.</span><span>Lisensi perangkat · Masa berlaku sejak aktivasi</span></footer></main><x-feedback/></body></html>
+
+/* Finish the hybrid light theme with clearly separated checkout surfaces. */
+:root[data-theme="light"] .storefront-body .checkout-studio .invoice-summary,:root[data-theme="light"] .storefront-body .checkout-studio .invoice-payment{border-color:#c4b7cd;box-shadow:0 8px 24px #30213d12;background:#fff}
+:root[data-theme="light"] .storefront-body .checkout-studio .invoice-section-title{padding:0 0 14px;border-bottom:2px solid #d9c8e2;color:#292131}
+:root[data-theme="light"] .storefront-body .checkout-studio .receipt-reference{background:linear-gradient(115deg,#2b2335,#40314c);border-color:#554260;color:#fff;--muted:#e0d2e8;--mint:#ffc0e7}
+:root[data-theme="light"] .storefront-body .checkout-studio .receipt-reference>span,:root[data-theme="light"] .storefront-body .checkout-studio .receipt-reference .icon-btn{color:#e0d2e8}
+:root[data-theme="light"] .storefront-body .checkout-studio .receipt-reference>strong{color:#ffc0e7}
+:root[data-theme="light"] .storefront-body .checkout-studio .studio-order-caption{display:block;background:#eee6f2;color:#554261;padding:9px 11px;border:1px solid #dbcee4;border-radius:8px;letter-spacing:.08em}
+:root[data-theme="light"] .storefront-body .checkout-studio .studio-order-group .invoice-facts>div{border-color:#ddd3e2}
+:root[data-theme="light"] .storefront-body .checkout-studio .invoice-facts dt{color:#60536a}
+:root[data-theme="light"] .storefront-body .checkout-studio .invoice-facts dd{color:#2d2434}
+:root[data-theme="light"] .storefront-body .checkout-studio .invoice-facts .studio-order-status{color:#97256b}
+:root[data-theme="light"] .storefront-body .checkout-studio .invoice-facts .studio-order-status.is-paid{color:#216d52}
+:root[data-theme="light"] .storefront-body .checkout-studio .studio-order-total{background:#f0e7f4;padding-inline:10px!important;border-radius:8px}
+:root[data-theme="light"] .storefront-body .checkout-studio .invoice-assurance{background:#e8f3f7;border-color:#b6d4df;color:#225b70;--muted:#395f6d}
+:root[data-theme="light"] .storefront-body .checkout-studio .invoice-total-card>strong small{color:#efb3df}
+:root[data-theme="light"] .storefront-body .checkout-studio .studio-method-choice{background:#f5f1f7;border-color:#cbbfd3}
+:root[data-theme="light"] .storefront-body .checkout-studio .studio-method-choice:has(input:checked){background:#f7e0ef;border-color:#a12770;box-shadow:0 0 0 1px #a12770}
+:root[data-theme="light"] .storefront-body .checkout-studio .studio-method-choice:has(input:checked) .studio-method-check,:root[data-theme="light"] .storefront-body .checkout-studio .studio-terms-consent input:checked+.studio-consent-mark{color:#fff}
+:root[data-theme="light"] .storefront-body .checkout-studio .studio-terms{background:#f1edf4;border-color:#cbbfd3}
+:root[data-theme="light"] .storefront-body .checkout-studio .receipt-live{background:#eae3f0;border-color:#cbbbd5;color:#493753}
+:root[data-theme="light"] .storefront-body .checkout-studio .receipt-safety{color:#51475a}
+:root[data-theme="light"] .storefront-body .checkout-studio .paid-key{background:#e8f5ef;border-color:#add5c2}
+.storefront-body .store-footer-v3{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;margin:28px 0 0;padding:18px 20px;border:1px solid #50405c;border-radius:15px;background:linear-gradient(115deg,#201b29,#35283e);color:#f5edf8;text-align:left}
+.store-footer-brand,.store-footer-info{display:flex;align-items:center;gap:10px}
+.store-footer-brand img{border-radius:9px;object-fit:cover}
+.store-footer-v3 strong,.store-footer-v3 small{display:block;line-height:1.5}
+.store-footer-v3 strong{font-size:13px;color:#fff}
+.store-footer-v3 small{font-size:11px;color:#d5c7df}
+.store-footer-info>svg{color:#efb3df}
+.store-footer-v3 nav{display:flex;gap:12px;flex-wrap:wrap}
+.store-footer-v3 nav a{display:inline-flex;align-items:center;gap:5px;color:#e8d8ef;font-size:12px;text-decoration:none}
+.store-footer-v3 nav a:hover{color:#ffc0e7}
+@media(max-width:650px){.storefront-body .store-footer-v3{align-items:flex-start;gap:14px;padding:15px}.store-footer-v3 nav{width:100%;border-top:1px solid #50405c;padding-top:12px}}
+</style></head><body class="member-body storefront-body"><header class="member-header store-header-v2"><a class="brand" href="{{ route('home') }}"><img class="brand-mark admin-brand-mark kz-brand-image" src="{{ asset('kz-brand.webp') }}" width="44" height="44" alt=""><span class="store-brand-copy"><strong>KazuhaDev<span class="brand-dot">.</span></strong><small>LICENSE STORE</small></span></a><nav class="store-header-nav" aria-label="Navigasi toko"><a href="{{ route('shop') }}" @if(request()->routeIs('home','shop')) aria-current="page" @endif><x-icon name="package" size="16"/> Katalog lisensi</a></nav><div class="member-header-actions"><a class="btn primary compact store-member-cta" href="{{ $license ? route('member.dashboard') : route('member.login') }}"><x-icon name="user" size="16"/> {{ $license?'Dashboard member':'Masuk member' }} <x-icon name="arrow" size="14"/></a><x-theme-toggle/></div></header><main class="storefront-main"><x-flash-messages/><div data-live-content>{{ $slot }}</div><footer class="footer store-footer-v3"><div class="store-footer-brand"><img src="{{ asset('kz-brand.webp') }}" width="36" height="36" alt=""><div><strong>KazuhaDev.</strong><small>© {{ now()->year }} · License Store</small></div></div><div class="store-footer-info"><x-icon name="shield" size="19"/><div><strong>Lisensi perangkat</strong><small>Masa berlaku sejak aktivasi</small></div></div><nav aria-label="Navigasi footer"><a href="{{ route('shop') }}">Katalog lisensi <x-icon name="arrow" size="13"/></a><a href="{{ route('member.login') }}">Portal member <x-icon name="arrow" size="13"/></a></nav></footer></main><x-feedback/></body></html>
