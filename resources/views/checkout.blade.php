@@ -78,7 +78,7 @@
 .checkout-studio .invoice-progress>li{padding:13px;border:1px solid var(--line);border-radius:12px;background:var(--soft);min-width:0}
 .checkout-studio .invoice-progress>li:after{display:none}
 .checkout-studio .invoice-progress>li.is-current{border-color:var(--mint);background:var(--mint-bg)}
-.checkout-studio .invoice-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);gap:18px;margin-top:18px;align-items:start;border:0}
+.checkout-studio .invoice-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);gap:18px;margin-top:18px;align-items:stretch;border:0}
 .checkout-studio .invoice-summary,.checkout-studio .invoice-payment{padding:25px;border:1px solid var(--line);border-radius:var(--studio-radius);background:var(--panel);min-width:0}
 .checkout-studio .invoice-section-title{font-size:19px;font-weight:700;letter-spacing:-.025em;margin-bottom:20px}
 .checkout-studio .receipt-reference{border-radius:13px;background:var(--soft);padding:16px}
@@ -105,5 +105,7 @@
 @media(max-width:800px){.checkout-studio .invoice-grid{grid-template-columns:1fr}.checkout-studio .invoice-payment{grid-row:1}.checkout-studio .invoice-hero{padding:20px}.checkout-studio .invoice-summary,.checkout-studio .invoice-payment{padding:20px}}
 @media(max-width:480px){.checkout-studio .invoice-hero{padding:16px}.checkout-studio .invoice-hero .payment-result{grid-template-columns:1fr;gap:8px;padding:20px 0}.checkout-studio .payment-result .invoice-hero-icon,.checkout-studio .payment-result .success-orbit{grid-column:1;grid-row:auto;width:52px;height:52px}.checkout-studio .payment-result .eyebrow,.checkout-studio .payment-result h1,.checkout-studio .payment-result p{grid-column:1}.checkout-studio .invoice-progress{gap:5px}.checkout-studio .invoice-progress>li{padding:8px}.checkout-studio .invoice-summary,.checkout-studio .invoice-payment{padding:16px}.checkout-studio .invoice-total-card{padding:18px}.checkout-studio .invoice-progress small{overflow-wrap:anywhere}}
 .checkout-studio .studio-member-action{margin-top:20px}.checkout-studio .studio-member-action .btn{min-height:50px;border-radius:12px;justify-content:center;font-size:14px}.checkout-studio .studio-member-action .field-help{margin:10px 0 0;text-align:center}
+.checkout-studio .invoice-summary,.checkout-studio .invoice-payment{display:flex;flex-direction:column}
+@media(min-width:801px){.checkout-studio .invoice-summary .invoice-assurance{margin-top:auto}.checkout-studio .invoice-summary .invoice-facts{margin-bottom:18px}}
 </style>
 </x-public-layout>
