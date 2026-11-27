@@ -26,6 +26,20 @@ class MemberPortalTest extends TestCase
         $this->assertNull($license->fresh()->expires_at);
     }
 
+    public function test_member_session_is_recognized_on_public_shop_and_login_page(): void
+    {
+        [$license,$key] = $this->issue();
+        $this->post('/member/login', ['key' => $key])->assertRedirect('/member');
+        foreach (['/', '/shop'] as $path) {
+            $this->get($path)->assertOk()->assertSee('Dashboard member')->assertSessionHas('member_license_id', $license->id);
+        }
+        $this->get('/member/login')->assertRedirect('/member');
+        $this->get('/member')->assertOk();
+        $this->post('/member/logout')->assertRedirect('/member/login');
+        $this->get('/shop')->assertOk()->assertSee('Masuk member');
+        $this->get('/member/login')->assertOk();
+    }
+
     public function test_invalid_and_revoked_keys_cannot_login_and_key_is_not_flashed(): void
     {
         [$license,$key] = $this->issue();
