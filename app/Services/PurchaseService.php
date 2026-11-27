@@ -81,9 +81,7 @@ class PurchaseService
                 throw ValidationException::withMessages(['payment_reference' => 'Lewati verifikasi manual: pembayaran ini menunggu webhook gateway terverifikasi.']);
             }
             if ($locked->purpose === 'renewal') {
-                $license = LicenseKey::findOrFail($locked->target_license_id);
-                abort_unless($license->id === $locked->owner_license_id, 409);
-                app(LicenseService::class)->extendSeconds($license, $locked->duration_seconds ?? $locked->days * 86400, $actor, $ip);
+                $license = $this->applyRenewal($locked, $actor, $ip, false);
             } else {
                 [$license] = app(LicenseService::class)->issue(['label' => $locked->product_name.' · '.$locked->number, 'member_name' => $locked->member_name, 'hours' => intdiv($locked->duration_seconds ?? $locked->days * 86400, 3600), 'minutes' => intdiv(($locked->duration_seconds ?? $locked->days * 86400) % 3600, 60), 'game_ids' => $locked->game_ids], $actor, $ip);
             }
@@ -94,6 +92,21 @@ class PurchaseService
 
             return $locked;
         }, 3);
+    }
+
+    // Called only inside a verified settlement transaction holding the order lock.
+    public function applyRenewal(PurchaseOrder $order, ?int $actor, ?string $ip, bool $sandbox): LicenseKey
+    {
+        abort_unless($order->purpose === 'renewal' && $order->status === 'pending', 409);
+        $license = LicenseKey::whereKey($order->target_license_id)->lockForUpdate()->firstOrFail();
+        abort_unless($license->id === $order->owner_license_id, 409);
+        $demo = PurchaseOrder::where('issued_license_id', $license->id)->where('gateway_mode', 'sandbox')->where('purpose', 'purchase')->where('status', 'paid')->exists();
+        abort_unless($demo === $sandbox, 409, 'Renewal payment mode does not match license environment.');
+        $seconds = $order->duration_seconds ?? $order->days * 86400;
+        abort_unless($seconds > 0, 409, 'Invalid renewal duration.');
+        app(LicenseService::class)->extendSeconds($license, $seconds, $actor, $ip);
+
+        return $license->refresh();
     }
 
     public function deleteUnpaid(PurchaseOrder $order, ?int $actor, ?string $ip, ?CarbonImmutable $olderThan = null): bool
